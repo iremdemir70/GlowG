@@ -4,6 +4,25 @@ import "./App.css";
 
 const baseUrl = "http://localhost:5000";
 
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import App from "./App";
+import Register from "./pages/Register/Register";
+import SkinTypeTest from "./pages/SkinTypeTest/SkinTypeTest";
+
+function RouterSetup() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/skin-test" element={<SkinTypeTest />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+
 function App() {
   const [description, setDescription] = useState("");
   const [editDescription, setEditDescription] = useState("");
