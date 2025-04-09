@@ -3,24 +3,6 @@ import "./Register.css";
 import axios from "axios";
 const baseUrl = "http://localhost:5000";
 
-
-const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    try {
-      const response = await axios.post(`${baseUrl}/register`, {
-        email: formData.email,
-        password: formData.password,
-        skinType: formData.skinType,
-        // diğer bilgiler...
-      });
-  
-      console.log("Kayıt başarılı:", response.data);
-    } catch (err) {
-      console.error("Kayıt sırasında hata:", err.message);
-    }
-  };
-
 function Register() {
   const [formData, setFormData] = useState({
     email: "",
@@ -57,15 +39,26 @@ function Register() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      console.log("Form başarıyla gönderildi", formData);
-      // API'ye gönderilebilir
-      setErrors({});
+      try {
+        const response = await axios.post(`${baseUrl}/register`, {
+          email: formData.email,
+          password: formData.password,
+          skinType: formData.skinType,
+          skinColor: formData.skinColor,
+          allergens: formData.allergens,
+        });
+
+        console.log("Kayıt başarılı:", response.data);
+        setErrors({});
+      } catch (err) {
+        console.error("Kayıt sırasında hata:", err.message);
+      }
     }
   };
 

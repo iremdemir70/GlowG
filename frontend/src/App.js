@@ -1,20 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Register from "./pages/Register/Register";
+import SkinTypeTest from "./pages/SkinTypeTest/SkinTypeTest";
 
 const baseUrl = "http://localhost:5000";
 
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import App from "./App";
-import Register from "./pages/Register/Register";
-import SkinTypeTest from "./pages/SkinTypeTest/SkinTypeTest";
 
 function RouterSetup() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<EventApp />} />
         <Route path="/register" element={<Register />} />
         <Route path="/skin-test" element={<SkinTypeTest />} />
       </Routes>
@@ -23,7 +21,7 @@ function RouterSetup() {
 }
 
 
-function App() {
+function EventApp() {
   const [description, setDescription] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [eventsList, setEventsList] = useState([]);
@@ -171,4 +169,4 @@ function App() {
   );
 }
 
-export default App;
+export default RouterSetup;
