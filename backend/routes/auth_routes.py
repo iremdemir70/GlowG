@@ -2,6 +2,9 @@ from flask import Blueprint, jsonify, request
 from models.user import User
 from flasgger import swag_from
 from database.db import bcrypt, db
+from flask import current_app
+from flask_mail import Message
+from mail_config import mail
 
 auth_bp = Blueprint('auth_bp', __name__)
 
@@ -79,4 +82,69 @@ def register_user():
     db.session.add(new_user)
     db.session.commit()
 
+    # Mail sender
+    msg = Message(
+    subject="GlowGenie Hesabını Doğrula",
+    sender=current_app.config['MAIL_USERNAME'],
+    recipients=[email],
+    body=f"Merhaba {email},\n\nLütfen hesabını doğrulamak için şu bağlantıya tıkla:\nhttp://127.0.0.1:5000/verify/{email}"
+    )
+    mail.send(msg)
+
     return {'message': 'Kayıt başarılı'}, 201
+
+
+
+@auth_bp.route('/verify/<path:email>', methods=['GET'])
+def verify_email(email):
+    import urllib.parse
+    decoded_email = urllib.parse.unquote(email)
+    print("GELEN EMAIL:", email)
+    print("DECODE EDİLMİŞ EMAIL:", decoded_email)
+    user = User.query.filter_by(email=decoded_email).first()
+    print("BULUNAN USER:", user)
+    if user:
+        user.is_verified = True
+        db.session.commit()
+        print("SONUÇ -> is_verified:", user.is_verified)
+        return jsonify({"message": f"{decoded_email} başarıyla doğrulandı!", "is_verified": user.is_verified})
+    print("KULLANICI BULUNAMADI!")
+    return jsonify({"error": "Kullanıcı bulunamadı"}), 404
+
+
+# login user
+@auth_bp.route('/login', methods=['POST'])
+@swag_from({
+    'tags': ['Auth'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'email': {'type': 'string'},
+                    'password': {'type': 'string'},
+                },
+                'required': ['email', 'password']
+            }
+        }
+    ],
+    'responses': {
+        200: {'description': 'Giriş başarılı'},
+        401: {'description': 'Geçersiz kimlik bilgileri'}
+    }
+})
+def login_user():
+    data = request.get_json()
+    print("POST DATA:", data)
+    email = data.get('email')
+    password = data.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    print("USER:", user)
+    if user and bcrypt.check_password_hash(user.password, password):
+        return {'message': 'Giriş başarılı', 'user_id': user.user_id}, 200
+    else:
+        return {'message': 'Geçersiz email veya şifre'}, 401
