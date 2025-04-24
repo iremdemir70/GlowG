@@ -7,12 +7,21 @@ from routes.auth_routes import auth_bp
 from flasgger import Swagger
 from routes.option_routes import options_bp
 from mail_config import mail 
+from flask import  jsonify
+from flask_cors import CORS
+from langchain_helper import get_product_ingredients
+from routes.openai_routes import openai_bp
+from apscheduler.schedulers.background import BackgroundScheduler
+from models.product import Product
+
 
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])
 swagger = Swagger(app)
 app.register_blueprint(options_bp)
 app.config.from_object(Config)
+app.register_blueprint(openai_bp)
  # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://glowuser:irem123@localhost:5432/glowgenie'
 
 
@@ -36,7 +45,16 @@ CORS(app)
 def hello():
     return 'Hey!'
 
+def delete_expired_products():
+    now = datetime.now().strftime('%Y-%m-%d')
+    expired = Product.query.filter(Product.expiration_date <= now).all()
+    for product in expired:
+        db.session.delete(product)
+    db.session.commit()
 
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=delete_expired_products, trigger="interval", hours=24)
+scheduler.start()
 
 if __name__ == '__main__':
     app.run()
