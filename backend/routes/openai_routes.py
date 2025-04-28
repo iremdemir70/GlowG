@@ -4,7 +4,7 @@ from database.db import db
 from models.product import Product
 from langchain_helper import get_product_ingredients
 from datetime import datetime, timedelta
-from .ingredient_helpers import save_ingredients_to_db, export_ingredients_to_csv
+from .ingredient_helpers import save_exist_ingredients, export_ingredients_to_csv  # export fonksiyonunu kullanmıyorsan çıkar
 
 openai_bp = Blueprint('openai_bp', __name__)
 
@@ -67,16 +67,15 @@ def predict():
     try:
         # Deepseek ile ingredientları çek
         response = get_product_ingredients(product_name)
-        # \n veya , ile geliyorsa split et!
-        # Önce satırlara ayır, gerekirse her satırı virgülle parçala:
+        # Her satırı split et, virgülle ayrılanları ayır
         lines = []
         for l in response.split("\n"):
             lines += [x.strip() for x in l.split(",") if x.strip()]
-        # lines = [line.strip() for line in response.split("\n") if line.strip()]  # Eğer sadece satır satır geliyorsa
+        
+        # 1. Sadece kritik ingredientlar var/yok kontrolü ve kaydı
+        save_exist_ingredients(product_id, lines)
 
-        # 1. DB'ye ingredientları kaydet
-        save_ingredients_to_db(product_id, lines)
-        # 2. O ürüne ait ingredientları csv'ye export et
+        # 2. İstersen ingredient list csv export et
         csv_file = export_ingredients_to_csv(lines, product_name)
 
         return jsonify({

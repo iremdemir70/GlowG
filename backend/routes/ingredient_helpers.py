@@ -1,40 +1,41 @@
-from models.product import Product
 from models.ingredients import Ingredient
-from models.productingredient import ProductIngredient
-import pandas as pd
+from models.exist_ingredients import ExistIngredient
 from database.db import db
-import os
 
-def save_ingredients_to_db(product_id, ingredients_list):
-    ingredient_ids = []
-    for ingredient_name in ingredients_list:
-        # Ingredient yoksa ekle
-        ingredient = Ingredient.query.filter_by(ingredient_name=ingredient_name).first()
-        if not ingredient:
-            ingredient = Ingredient(ingredient_name=ingredient_name)
-            db.session.add(ingredient)
-            db.session.commit()
-        ingredient_ids.append(ingredient.ingredient_id)
+def save_exist_ingredients(product_id, product_ingredients):
+    """
+    product_id: int, aratılan ürünün id'si
+    product_ingredients: list, prompt'tan gelen temiz ingredient isim listesi
+    """
+    # Tüm kritik içerikleri çek
+    critical_ingredients = Ingredient.query.all()
 
-        # productingredients bağlantısını ekle
-        pi = ProductIngredient.query.filter_by(product_id=product_id, ingredient_id=ingredient.ingredient_id).first()
-        if not pi:
-            pi = ProductIngredient(product_id=product_id, ingredient_id=ingredient.ingredient_id)
-            db.session.add(pi)
-            db.session.commit()
-    return ingredient_ids
-
+    for crit in critical_ingredients:
+        is_exist = int(any(
+            crit.ingredient_name.lower() == i.lower() for i in product_ingredients
+        ))
+        # Her ürün–ingredient çifti için kayıt ekle
+        exist = ExistIngredient.query.filter_by(product_id=product_id, ingredient_id=crit.ingredient_id).first()
+        if not exist:
+            exist = ExistIngredient(
+                product_id=product_id,
+                ingredient_id=crit.ingredient_id,
+                is_exist=is_exist
+            )
+            db.session.add(exist)
+        else:
+            exist.is_exist = is_exist  # Güncelle
+    db.session.commit()
 def export_ingredients_to_csv(ingredients_list, product_name):
     import os
     import pandas as pd
 
     folder_path = "csv_files"
-    os.makedirs(folder_path, exist_ok=True)  # Klasör yoksa oluştur
+    os.makedirs(folder_path, exist_ok=True)
 
     filename = f"{product_name}_ingredients.csv".replace(" ", "_").lower()
     file_path = os.path.join(folder_path, filename)
 
     df = pd.DataFrame({"ingredient_name": ingredients_list})
     df.to_csv(file_path, index=False)
-    return file_path  # <--- Tam dosya yolunu döndürür (ör: backend/csv_files/cerave_cleanser_ingredients.csv)
-
+    return file_path
