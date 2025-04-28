@@ -103,7 +103,9 @@ y_pred = model.predict(X_test)
 #print("\nClassification Report:\n", classification_report(y_test, y_pred))
 #print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
-joblib.dump(model, 'skintypeprediction.pkl')
+feature_order = X_train.columns.tolist()
+joblib.dump((model, feature_order), 'skintypeprediction.pkl')
+
 
 """
 from sklearn.ensemble import RandomForestClassifier
