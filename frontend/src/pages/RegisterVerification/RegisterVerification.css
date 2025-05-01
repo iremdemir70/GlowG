@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #f3e7e9, #e3eeff);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.logo {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 2rem;
+    text-align: center;
+    color: #4b0082;
+  }
+/* Tüm öğeler için border-box */
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* Ana kapsayıcı */
+.verification-wrapper {
+    display: flex;
+    justify-content: center; /* YATAYDA ortaya hizala */
+    align-items: flex-start; /* DİKEYDE BAŞTAN başlat */
+    margin-top: 50px; 
+    gap: 40px;
+    flex-direction: row;
+}
+
+/* Sol tarafta üst üste iki popup */
+.popup-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 400px;
+}
+
+/* Ortak popup stilleri */
+.popup {
+    font-size: 14px;
+    background-color: #fff;
+    border: 10px solid #f5dbed;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    width: 100%; /* popup-group genişliğini aynen alır */
+}
+
+/* Kod giriş kartı */
+.code-card {
+    width: 300px;
+    background-color: #fff;
+    border: 10px solid #C0BCDC;
+    border-radius: 20px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.code-card h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #444;
+}
+
+/* Kod kutuları */
+.code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.code-inputs input {
+    width: 40px;
+    height: 50px;
+    font-size: 24px;
+    text-align: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.code-inputs input:focus {
+    outline: none;
+    border-color: #C0BCDC;
+}
+
+/* Doğrulama butonu */
+.verify-btn {
+    background-color: #C0BCDC;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.verify-btn:hover {
+    background-color: #a59be4;
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
+
+/* Media Query - Mobil Cihazlar için */
+@media (max-width: 768px) {
+    .verification-wrapper {
+        flex-direction: column; /* Dikey düzen */
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    .popup-group {
+        flex-direction: column-reverse; /* Popup'ların sırasını değiştir */
+        width: 100%;
+    }
+
+    /* Kod giriş kartının genişliğini azalt */
+    .code-card {
+        width: 80%; /* Genişliği %80 yapalım */
+        padding: 20px 15px; /* İçerik alanını daha küçük yapalım */
+        margin: 0 auto;
+    }
+
+    /* Logo font boyutunu küçült */
+    .logo {
+        font-size: 1.5rem; 
+    }
+    
+    /* Popup açıklamalarını metinlere uygun hizala */
+    .popup-description {
+        font-size: 16px; /* Mobilde daha okunabilir metin */
+    }
+}

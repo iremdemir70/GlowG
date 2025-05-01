@@ -1,64 +1,70 @@
 import React, { useState } from "react";
-import "./Register.css";
-import axios from "axios";
-const baseUrl = "http://localhost:5000";
+import "./registerstyles.css";
+import { useNavigate } from "react-router-dom";
 
-function Register() {
+const RegisterForm = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
-    allergens: "",
     skinType: "",
     skinColor: "",
-    agreed: false,
+    allergens: "",
+    userAgreement: false,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({
+    password: false,
+    confirmPassword: false,
+    mandatory: false,
+  });
+
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    const val = type === "checkbox" ? checked : value;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
   };
 
-  const validate = () => {
-    const newErrors = {};
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
-
-    if (!formData.email) newErrors.email = true;
-    if (!passwordPattern.test(formData.password)) newErrors.password = true;
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = true;
-    if (!formData.skinType) newErrors.skinType = true;
-    if (!formData.skinColor) newErrors.skinColor = true;
-    if (!formData.agreed) newErrors.agreed = true;
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      try {
-        const response = await axios.post(`${baseUrl}/register`, {
-          email: formData.email,
-          password: formData.password,
-          skinType: formData.skinType,
-          skinColor: formData.skinColor,
-          allergens: formData.allergens,
-        });
 
-        console.log("Kayıt başarılı:", response.data);
-        setErrors({});
-      } catch (err) {
-        console.error("Kayıt sırasında hata:", err.message);
-      }
+    let isValid = true;
+    const newErrors = { password: false, confirmPassword: false, mandatory: false };
+
+    if (!passwordPattern.test(formData.password)) {
+      newErrors.password = true;
+      isValid = false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = true;
+      isValid = false;
+    }
+
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      !formData.skinType ||
+      !formData.skinColor ||
+      !formData.userAgreement
+    ) {
+      newErrors.mandatory = true;
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (isValid) {
+      navigate("/RegisterVerification");
     }
   };
 
@@ -86,7 +92,8 @@ function Register() {
           />
           {errors.password && (
             <p className="error-text">
-              Password must contain uppercase, lowercase, number, and special character.
+              Password must contain at least one uppercase letter, lowercase
+              letter, one number, and one special character.
             </p>
           )}
 
@@ -105,7 +112,7 @@ function Register() {
           <label>Skin Type*</label>
           <div className="radio-group">
             {["Dry", "Normal", "Oily", "Combination", "Unknown"].map((type) => (
-              <label key={type}>
+              <label key={type} className="radio-option">
                 <input
                   type="radio"
                   name="skinType"
@@ -113,7 +120,7 @@ function Register() {
                   checked={formData.skinType === type}
                   onChange={handleChange}
                 />
-                {type} Skin
+                {type === "Unknown" ? "I don't know my skin type" : `${type} Skin`}
               </label>
             ))}
           </div>
@@ -121,7 +128,7 @@ function Register() {
           <label>Skin Color*</label>
           <div className="radio-group">
             {["Light", "Medium", "Dark"].map((color) => (
-              <label key={color}>
+              <label key={color} className="radio-option">
                 <input
                   type="radio"
                   name="skinColor"
@@ -129,7 +136,7 @@ function Register() {
                   checked={formData.skinColor === color}
                   onChange={handleChange}
                 />
-                {color} Skin
+                {`${color} Skin`}
               </label>
             ))}
           </div>
@@ -138,22 +145,23 @@ function Register() {
           <input
             type="text"
             name="allergens"
+            placeholder="Enter allergens"
             value={formData.allergens}
             onChange={handleChange}
-            placeholder="Enter allergens"
           />
           <p className="error-text">
-            Please enter allergens like Paraben, Alcohol, etc.
+            Please enter the allergens in the desired form. Such as Paraben,
+            Alcohol, etc.
           </p>
 
           <label>
             <input
               type="checkbox"
-              name="agreed"
-              checked={formData.agreed}
+              name="userAgreement"
+              checked={formData.userAgreement}
               onChange={handleChange}
               required
-            />{" "}
+            />
             User Agreement*
           </label>
 
@@ -164,19 +172,19 @@ function Register() {
             <button
               type="button"
               className="cancel-btn"
-              onClick={() => window.location.href = "/"}
+              onClick={() => navigate("/")}
             >
               Cancel
             </button>
           </div>
 
-          {Object.keys(errors).length > 0 && (
-            <p className="error-text">Please fill in all mandatory areas correctly.</p>
+          {errors.mandatory && (
+            <p className="error-text">Please fill in the mandatory areas.</p>
           )}
         </form>
       </div>
     </div>
   );
-}
+};
 
-export default Register;
+export default RegisterForm;
