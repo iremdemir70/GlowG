@@ -5,7 +5,6 @@ import pandas as pd
 
 skin_bp = Blueprint('skin_bp', __name__)
 
-# Modeli yükle
 model, EXPECTED_COLUMNS = joblib.load('skintypeprediction.pkl')
 
 
@@ -104,22 +103,17 @@ def predict_skin_type():
         if not data:
             return jsonify({'error': 'Eksik veri'}), 400
 
-        # 👇👇👇 BURASI YENİ 👇👇👇
         mapped_data = map_user_inputs(data)
         user_df = pd.DataFrame([mapped_data])
-        # 👆👆👆 BURASI YENİ 👆👆👆
 
         user_df_encoded = pd.get_dummies(user_df)
 
-        # Eksik kolonları tamamla
         for col in EXPECTED_COLUMNS:
             if col not in user_df_encoded.columns:
                 user_df_encoded[col] = 0
 
-        # Kolon sırasını sabitle
         user_df_encoded = user_df_encoded[EXPECTED_COLUMNS]
 
-        # Prediction yap
         prediction = model.predict(user_df_encoded)[0]
 
         return jsonify({'prediction': int(prediction)})

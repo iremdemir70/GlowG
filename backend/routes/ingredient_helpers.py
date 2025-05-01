@@ -7,14 +7,12 @@ def save_exist_ingredients(product_id, product_ingredients):
     product_id: int, aratılan ürünün id'si
     product_ingredients: list, prompt'tan gelen temiz ingredient isim listesi
     """
-    # Tüm kritik içerikleri çek
     critical_ingredients = Ingredient.query.all()
 
     for crit in critical_ingredients:
         is_exist = int(any(
             crit.ingredient_name.lower() == i.lower() for i in product_ingredients
         ))
-        # Her ürün–ingredient çifti için kayıt ekle
         exist = ExistIngredient.query.filter_by(product_id=product_id, ingredient_id=crit.ingredient_id).first()
         if not exist:
             exist = ExistIngredient(
@@ -24,7 +22,7 @@ def save_exist_ingredients(product_id, product_ingredients):
             )
             db.session.add(exist)
         else:
-            exist.is_exist = is_exist  # Güncelle
+            exist.is_exist = is_exist  
     db.session.commit()
 def export_ingredients_to_csv(ingredients_list, product_name):
     import os

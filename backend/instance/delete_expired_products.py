@@ -10,4 +10,3 @@ def delete_expired_products():
     db.session.commit()
     print(f"{len(expired)} ürün silindi.")
 
-# Bunu manuel çalıştırabilirsin veya APScheduler ile periyodik çalıştır
