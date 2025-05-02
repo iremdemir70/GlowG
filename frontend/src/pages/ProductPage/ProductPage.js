@@ -6,7 +6,6 @@ const categories = ["Cleanser", "Moisturizer", "Sunscreen", "Serum", "Toner"];
 
 export default function ProductPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [products, setProducts] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 

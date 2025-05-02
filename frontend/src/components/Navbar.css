@@ -1,0 +1,35 @@
+/* src/components/Navbar.css */
+.nav {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .nav .navlinks {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  .nav .navlinks li a {
+    color: white;
+    text-decoration: none;
+  }
+  .navTrigger {
+    display: none;
+  }
+  @media screen and (max-width: 768px) {
+    .navTrigger {
+      display: block;
+      cursor: pointer;
+    }
+    .main_list {
+      display: none;
+      flex-direction: column;
+    }
+    .main_list.show_list {
+      display: flex;
+    }
+  }
+  
