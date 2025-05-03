@@ -85,7 +85,6 @@ categories.forEach(cat => {
 
   return (
     <>
-      <Navbar /> {/* Navbar componenti burada çağrıldı */}
 
       <main className="main-content">
         <h2 className="section-title">
@@ -135,11 +134,9 @@ categories.forEach(cat => {
     ))}
   </div>
   
-  {visibleCount < filteredProducts.length && (
-    <button id="view-more-btn" className="view-more-btn" onClick={handleViewMore}>
-      View More
-    </button>
-  )}
+  <button id="view-more-btn" className="view-more-btn" onClick={handleViewMore}>
+    View More
+  </button>
 </section>
 
 

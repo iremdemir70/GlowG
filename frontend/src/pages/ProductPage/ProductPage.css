@@ -138,11 +138,12 @@ body {
   
   .products-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 sabit kolon */
+    grid-template-columns: repeat(4, 1fr); /* 4 ürün yan yana */
     gap: 20px;
     padding: 20px 40px;
     justify-items: center;
   }
+  
   
   .product-card {
     border: 2px solid #5a009d;
