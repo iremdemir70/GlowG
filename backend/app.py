@@ -14,6 +14,9 @@ from routes.openai_routes import openai_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 from models.product import Product
 from routes.skin_type_routes import skin_bp
+from routes.product_routes import product_bp
+from routes.category_routes import category_bp  
+
 
 
 app = Flask(__name__)
@@ -23,6 +26,9 @@ app.register_blueprint(options_bp)
 app.config.from_object(Config)
 app.register_blueprint(openai_bp)
 app.register_blueprint(skin_bp)
+app.register_blueprint(product_bp)
+app.register_blueprint(category_bp)
+
  # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://glowuser:irem123@localhost:5432/glowgenie'
 
 

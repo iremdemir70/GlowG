@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import './ProductPage.css';
-import Navbar from '../../components/Navbar';
-import '../../components/Navbar.css';
+import { FaHome } from 'react-icons/fa';
 
-
-const categories = ["Cleanser", "Moisturizer", "Sunscreen", "Serum", "Toner"];
-const products = [
-  { id: 1, name: 'Product 1', category: 'Cleanser', price: '$20' },
-  { id: 2, name: 'Product 2', category: 'Moisturizer', price: '$30' },
-  { id: 3, name: 'Product 3', category: 'Sunscreen', price: '$25' },
-  { id: 4, name: 'Product 4', category: 'Serum', price: '$40' },
-  { id: 5, name: 'Product 5', category: 'Toner', price: '$15' },
-];
 
 export default function ProductPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); 
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(8); // 2 satır x 4 sütun
+
+  const categoryMap = {};
+categories.forEach(cat => {
+  categoryMap[cat.category_id] = cat.category_name;
+});
+
+    const handleViewMore = () => {
+      setVisibleCount(prev => prev + 8); 
+    };
+
 
   const handleCategoryChange = (event) => {
     const value = event.target.value;
@@ -26,21 +31,83 @@ export default function ProductPage() {
     );
   };
 
+  const handleScroll = () => {
+    setIsScrolled(window.scrollY > 50);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+  
+    // Ürünleri çek
+    fetch('http://127.0.0.1:5000/products')
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fetched products:", data);  // 👈 log eklendi
+        setProducts(data);
+      })
+      .catch(err => console.error("Product fetch error:", err));
+  
+    // Kategorileri çek
+    fetch('http://127.0.0.1:5000/categories')
+    .then(res => res.json())
+    .then(data => {
+      console.log("Fetched categories:", data);
+      setCategories(data); // artık içinde id ve name var
+    });
+  
+  
+  }, []);
+  
+  
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev);
+  };
+
   const toggleDropdown = () => {
     setDropdownOpen(prev => !prev);
   };
 
   const handleFilter = () => {
+    // Ürünleri filtreleme işlemi burada yapılabilir
     console.log("Filtering for:", selectedCategories);
   };
 
-  const filteredProducts = products.filter(product =>
-    selectedCategories.length === 0 || selectedCategories.includes(product.category)
-  );
+  // Seçilen kategorilere göre filtrelenmiş ürünleri al
+  const filteredProducts = products.filter(product => {
+    if (selectedCategories.length === 0) return true;
+    const productCategoryName = categoryMap[product.category_id];
+    return selectedCategories.includes(productCategoryName);
+  });
+  
+  
 
   return (
     <>
-      <Navbar /> {/* Navbar component*/}
+      <nav className={`nav ${isScrolled ? 'affix' : ''}`}>
+        <div className="container">
+          <div className="logo">
+          <li><a href="#" className="btn-info">GlowGenie</a></li>
+          </div>
+          <div id="mainListDiv" className={`main_list ${menuOpen ? 'show_list' : ''}`}>
+            <ul className="navlinks">
+              <li><a href="#" className="btn-info">About</a></li>
+              <li><a href="#" className="btn-info">Contact</a></li>
+              <li>
+                <button className="btn" onClick={() => window.location.href = 'index.html'}>
+                  <FaHome />
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <span className="navTrigger" onClick={toggleMenu}>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+        </div>
+      </nav>
 
       <main className="main-content">
         <h2 className="section-title">
@@ -49,46 +116,52 @@ export default function ProductPage() {
       </main>
 
       <div className="filter-section">
-        <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
-          <dt>
-            <a href="#" onClick={toggleDropdown}>
-              <span className="hida">Select Product Category</span>
-              <p className="multiSel">{selectedCategories.join(', ')}</p>
-            </a>
-          </dt>
-          <dd>
-            <div className="mutliSelect">
-              <ul>
-                {categories.map(category => (
-                  <li key={category}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        value={category}
-                        checked={selectedCategories.includes(category)}
-                        onChange={handleCategoryChange}
-                      />
-                      {category}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </dd>
-          <button onClick={handleFilter}>Filter</button>
-        </dl>
+      <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
+      <dt>
+  {/* eski: <a href="#" onClick={toggleDropdown}> */}
+  <button type="button" onClick={toggleDropdown} className="dropdown-toggle">
+    <span className="hida">Select Product Category</span>
+    <p className="multiSel">{selectedCategories.join(', ')}</p>
+  </button>
+</dt>
+
+  <dd>
+    <div className="mutliSelect">
+      <ul>
+      {categories.map(category => (
+          <li key={category.category_id}>
+            <label>
+              <input
+                type="checkbox"
+                value={category.category_name}
+                checked={selectedCategories.includes(category.category_name)}
+                onChange={handleCategoryChange}
+              />
+              {category.category_name}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </dd>
+  <button onClick={handleFilter}>Filter</button>
+</dl>
+
       </div>
 
       <section className="products-section">
         <div id="product-list" className="products-container">
-          {filteredProducts.map(product => (
-            <div key={product.id} className="product-card">
-              <h3>{product.name}</h3>
-              <p>{product.category}</p>
+        {filteredProducts.slice(0, visibleCount).map(product => (
+            <div key={product.product_id} className="product-card">
+              <h3>{product.product_name}</h3>
             </div>
           ))}
+
+
         </div>
-        <button id="view-more-btn" className="view-more-btn">View More</button>
+        {visibleCount < filteredProducts.length && (
+          <button id="view-more-btn" onClick={handleViewMore}>View More</button>
+        )}
       </section>
 
       <div style={{ height: '1000px' }} />

@@ -9,7 +9,7 @@ body {
     align-items: flex-start;
 } 
 .btn {
-    background-color: #7f45c6; 
+    background-color: #7f45c6; /* Blue background */
     border: none; /* Remove borders */
     border-radius: 20px;
     color: white; /* White text */
@@ -24,8 +24,8 @@ body {
   }
 
   .main-content {
-    padding-top: 120px; 
-    padding-left: 30px; 
+    padding-top: 120px; /* nav'dan sonra boÅŸluk */
+    padding-left: 30px; /* sola hizalama */
 }
 
 .section-title {
@@ -36,20 +36,20 @@ body {
     margin: 0;
 }
 
-/* === General Settings === */
+/* === Genel Ayarlar === */
 .filter-section {
-    margin-left: 30px;   
-    margin-top: 20px;    
+    margin-left: 30px;   /* BaÅŸlÄ±ÄŸÄ±n sola hizasÄ±na uygun */
+    margin-top: 20px;    /* BaÅŸlÄ±k ile dropdown arasÄ±nda mesafe */
   }
   
-  /* === Dropdown === */
+  /* === Dropdown OdaÄŸÄ± === */
   .filter-section .dropdown {
-    display: block;      
-    width: 300px;        
-    margin-bottom: 15px; 
+    display: block;      /* AkÄ±ÅŸ iÃ§inde alt alta gelir */
+    width: 300px;        /* Sabit geniÅŸlik */
+    margin-bottom: 15px; /* Filter butonuna kadar boÅŸluk */
   }
   
-  /* Select box */
+  /* BaÅŸlÄ±k linki (Select kutusu) */
   .filter-section .dropdown dt a,
   .filter-section .dropdown dt a:visited {
     display: block;
@@ -68,17 +68,17 @@ body {
     cursor: pointer;
   }
   
-  /* Placeholder “Select” */
+  /* Placeholder â€œSelectâ€ yazÄ±sÄ± */
   .filter-section .dropdown dt a .hida {
     color: #6b2e87;
   }
   
-  /* open list*/
+  /* AÃ§Ä±lÄ±r liste kapsayÄ±cÄ±sÄ± */
   .filter-section .dropdown dd {
     position: relative;
   }
   
-  /* List of options */
+  /* SeÃ§enekler listesi */
   .filter-section .dropdown dd ul {
     list-style: none;
     padding: 5px;
@@ -88,14 +88,14 @@ body {
     max-height: 120px;
     overflow-y: auto;
     box-sizing: border-box;
-    display: none;  /* for start hidden */
+    display: none;  /* BaÅŸlangÄ±Ã§ta gizli */
 }
   
-/* When dropdown opens*/
+/* Dropdown aÃ§Ä±ldÄ±ÄŸÄ±nda */
 .filter-section .dropdown.open dd ul {
-    display: block; /* show when dropdown opens */
+    display: block; /* Dropdown aÃ§Ä±ldÄ±ÄŸÄ±nda gÃ¶ster */
 }
-  /* options */
+  /* Her bir seÃ§enek */
   .filter-section .dropdown dd ul li {
     margin: 5px 0;
   }
@@ -113,13 +113,13 @@ body {
     cursor: pointer;
   }
   
-  /* options hover */
+  /* SeÃ§enek hover efekti */
   .filter-section .dropdown dd ul li:hover {
     background-color: #fff;
     border-radius: 6px;
   }
   
-  /* === Filter Button=== */
+  /* === Filter Butonu === */
   .filter-section .dropdown > button {
     display: block;
     width: 100%;
@@ -139,26 +139,30 @@ body {
   
 
   .products-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 sabit kolon */
+    gap: 20px;
+    padding: 20px 40px;
+    justify-items: center;
   }
+  
 
   .product-card {
     border: 2px solid #5a009d;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
     background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
+    border-radius: 12px;
+    padding: 16px;
+    width: 100%;
+    max-width: 220px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    text-align: center;
+    font-weight: 600;
   }
   
-  /* View More button */
+  /* View More butonu */
   #view-more-btn {
-    display: block;           
-    margin: 30px auto 0 auto; 
+    display: block;           /* block yaparak margin:auto Ã§alÄ±ÅŸtÄ±r */
+    margin: 30px auto 0 auto; /* Ã¼stte 30px boÅŸluk, yanyana ortalanÄ±r */
     padding: 10px 20px;
     background-color: #6b2e87;
     color: #fff;
@@ -166,10 +170,356 @@ body {
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    width: fit-content;       
+    width: fit-content;       /* iÃ§eriÄŸe gÃ¶re geniÅŸlik alÄ±r */
   }
   
   #view-more-btn:hover {
     background-color: #58205d;
   }
- 
+  
+/* Navbar section */
+@import url('https://fonts.googleapis.com/css?family=Quicksand:400,500,700');
+html,
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Quicksand", sans-serif;
+    font-size: 62.5%;
+    font-size: 10px;
+}
+
+.nav {
+    width: 100%;
+    height: 65px;
+    position: fixed;
+    line-height: 65px;
+    text-align: center;
+}
+
+.nav .logo {
+    float: left;
+    padding-left: 3rem;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 2.8rem;
+    margin-top: 0;
+}
+
+.nav .logo a {
+    text-decoration: none;
+    color: #6b2e87; 
+    transition: color 0.3s ease;
+}
+
+.nav .logo a:hover {
+    color: #c797eb; 
+}
+
+.nav div.main_list {
+    height: 65px;
+    float: right;
+}
+
+.nav div.main_list ul {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav div.main_list ul li {
+    width: auto;
+    height: 65px;
+    padding: 0;
+    padding-right: 3rem;
+}
+
+.nav div.main_list ul li a {
+    text-decoration: none;
+    line-height: 65px;
+    font-size: 2.4rem;
+}
+
+.navTrigger {
+    display: none;
+}
+
+.nav {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    -webkit-transition: all 0.4s ease;
+    transition: all 0.4s ease;
+}
+
+
+
+ .btn-info:hover{
+    color: #c797eb;
+}
+
+/* Media qurey section */
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    .container {
+        margin: 0;
+    }
+}
+
+@media screen and (max-width:768px) {
+    .navTrigger {
+        display: block;
+    }
+    .nav div.logo {
+        margin-left: 15px;
+    }
+    .nav div.main_list {
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+    }
+    .nav div.show_list {
+        height: auto;
+        display: none;
+    }   
+
+    .nav div.main_list ul li {
+        width: 100%;
+        text-align: right;
+    }
+    .nav div.main_list ul li a {
+        text-align: center;
+        width: 100%;
+        font-size: 3rem;
+        padding: 20px;
+    }
+    .nav div.media_button {
+        display: block;
+    }
+}
+
+.navTrigger {
+    cursor: pointer;
+    width: 30px;
+    height: 25px;
+    margin: auto;
+    position: absolute;
+    right: 30px;
+    top: 0;
+    bottom: 0;
+}
+
+.navTrigger i {
+    background-color: #fff;
+    border-radius: 2px;
+    content: '';
+    display: block;
+    width: 100%;
+    height: 4px;
+}
+
+.navTrigger i:nth-child(1) {
+    -webkit-animation: outT 0.8s backwards;
+    animation: outT 0.8s backwards;
+    -webkit-animation-direction: reverse;
+    animation-direction: reverse;
+}
+
+.navTrigger i:nth-child(2) {
+    margin: 5px 0;
+    -webkit-animation: outM 0.8s backwards;
+    animation: outM 0.8s backwards;
+    -webkit-animation-direction: reverse;
+    animation-direction: reverse;
+}
+
+.navTrigger i:nth-child(3) {
+    -webkit-animation: outBtm 0.8s backwards;
+    animation: outBtm 0.8s backwards;
+    -webkit-animation-direction: reverse;
+    animation-direction: reverse;
+}
+
+.navTrigger.active i:nth-child(1) {
+    -webkit-animation: inT 0.8s forwards;
+    animation: inT 0.8s forwards;
+}
+
+.navTrigger.active i:nth-child(2) {
+    -webkit-animation: inM 0.8s forwards;
+    animation: inM 0.8s forwards;
+}
+
+.navTrigger.active i:nth-child(3) {
+    -webkit-animation: inBtm 0.8s forwards;
+    animation: inBtm 0.8s forwards;
+}
+
+
+@-webkit-keyframes inM {
+    50% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(45deg);
+    }
+}
+
+@keyframes inM {
+    50% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(45deg);
+    }
+}
+
+@-webkit-keyframes outM {
+    50% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(45deg);
+    }
+}
+
+@keyframes outM {
+    50% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(45deg);
+    }
+}
+
+@-webkit-keyframes inT {
+    0% {
+        -webkit-transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        -webkit-transform: translateY(9px) rotate(0deg);
+    }
+    100% {
+        -webkit-transform: translateY(9px) rotate(135deg);
+    }
+}
+
+@keyframes inT {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(9px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(9px) rotate(135deg);
+    }
+}
+
+@-webkit-keyframes outT {
+    0% {
+        -webkit-transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        -webkit-transform: translateY(9px) rotate(0deg);
+    }
+    100% {
+        -webkit-transform: translateY(9px) rotate(135deg);
+    }
+}
+
+@keyframes outT {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(9px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(9px) rotate(135deg);
+    }
+}
+
+@-webkit-keyframes inBtm {
+    0% {
+        -webkit-transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        -webkit-transform: translateY(-9px) rotate(0deg);
+    }
+    100% {
+        -webkit-transform: translateY(-9px) rotate(135deg);
+    }
+}
+
+@keyframes inBtm {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-9px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-9px) rotate(135deg);
+    }
+}
+
+@-webkit-keyframes outBtm {
+    0% {
+        -webkit-transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        -webkit-transform: translateY(-9px) rotate(0deg);
+    }
+    100% {
+        -webkit-transform: translateY(-9px) rotate(135deg);
+    }
+}
+
+@keyframes outBtm {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-9px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-9px) rotate(135deg);
+    }
+}
+
+.affix {
+    padding: 0;
+    background-color: #f5dbed;
+}
+
+
+.myH2 {
+	text-align:center;
+	font-size: 4rem;
+}
+.myP {
+	text-align: justify;
+	padding-left:15%;
+	padding-right:15%;
+	font-size: 20px;
+}
+@media all and (max-width:700px){
+	.myP {
+		padding:2%;
+	}
+}
+
+@media screen and (max-width: 1024px) {
+    .products-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .products-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
