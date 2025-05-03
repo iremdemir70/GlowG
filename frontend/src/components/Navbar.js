@@ -17,6 +17,29 @@ const Navbar = () => {
     setMenuOpen(!menuOpen);
   };
 
+  return(
+<nav className={`nav ${scrolled ? "affix" : ""}`}>
+  <div className="logo">
+    <a href="/">GlowGenie</a>
+  </div>
+  <div className={`navlinks ${menuOpen ? "open" : ""}`}>
+  <li><a href="#" className="btn-info">About</a></li>
+  <li><a href="#" className="btn-info">Contact</a></li>
+  <li><a href="#" className="btn-info">Home Page</a> </li>
+          
+  </div>
+  <div className="navTrigger" onClick={handleToggle}>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>
+
+  );
+};
+
+export default Navbar;
+/*
   return (
     <nav className={`nav ${scrolled ? "affix" : ""}`}>
       <div className="container">
@@ -41,7 +64,9 @@ const Navbar = () => {
         </span>
       </div>
     </nav>
-  );
-};
-
-export default Navbar;
+  );*/
+ /*          <li>
+              <button className="btn" onClick={() => window.location.href = "index.html"}>
+                <i className="fa fa-home"></i>
+              </button>
+            </li> */

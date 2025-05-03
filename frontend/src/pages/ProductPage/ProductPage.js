@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './ProductPage.css';
-import { FaHome } from 'react-icons/fa';
+import Navbar from '../../components/Navbar';
+import '../../components/Navbar.css';
+
 
 const categories = ["Cleanser", "Moisturizer", "Sunscreen", "Serum", "Toner"];
 const products = [
@@ -9,14 +11,11 @@ const products = [
   { id: 3, name: 'Product 3', category: 'Sunscreen', price: '$25' },
   { id: 4, name: 'Product 4', category: 'Serum', price: '$40' },
   { id: 5, name: 'Product 5', category: 'Toner', price: '$15' },
-  // Diğer ürünler buraya eklenebilir
 ];
 
 export default function ProductPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown menüsünün açık olup olmadığı
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleCategoryChange = (event) => {
     const value = event.target.value;
@@ -27,59 +26,21 @@ export default function ProductPage() {
     );
   };
 
-  const handleScroll = () => {
-    setIsScrolled(window.scrollY > 50);
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleMenu = () => {
-    setMenuOpen(prev => !prev);
-  };
-
   const toggleDropdown = () => {
     setDropdownOpen(prev => !prev);
   };
 
   const handleFilter = () => {
-    // Ürünleri filtreleme işlemi burada yapılabilir
     console.log("Filtering for:", selectedCategories);
   };
 
-  // Seçilen kategorilere göre filtrelenmiş ürünleri al
   const filteredProducts = products.filter(product =>
     selectedCategories.length === 0 || selectedCategories.includes(product.category)
   );
 
   return (
     <>
-      <nav className={`nav ${isScrolled ? 'affix' : ''}`}>
-        <div className="container">
-          <div className="logo">
-            <a href="#">Glow Genie</a>
-          </div>
-          <div id="mainListDiv" className={`main_list ${menuOpen ? 'show_list' : ''}`}>
-            <ul className="navlinks">
-              <li><a href="#" className="btn-info">About</a></li>
-              <li><a href="#" className="btn-info">Contact</a></li>
-              <li>
-                <button className="btn" onClick={() => window.location.href = 'index.html'}>
-                  <FaHome />
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <span className="navTrigger" onClick={toggleMenu}>
-            <i></i>
-            <i></i>
-            <i></i>
-          </span>
-        </div>
-      </nav>
+      <Navbar /> {/* Navbar component*/}
 
       <main className="main-content">
         <h2 className="section-title">
@@ -88,35 +49,34 @@ export default function ProductPage() {
       </main>
 
       <div className="filter-section">
-      <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
-  <dt>
-    <a href="#" onClick={toggleDropdown}>
-      <span className="hida">Select Product Category</span>
-      <p className="multiSel">{selectedCategories.join(', ')}</p>
-    </a>
-  </dt>
-  <dd>
-    <div className="mutliSelect">
-      <ul>
-        {categories.map(category => (
-          <li key={category}>
-            <label>
-              <input
-                type="checkbox"
-                value={category}
-                checked={selectedCategories.includes(category)}
-                onChange={handleCategoryChange}
-              />
-              {category}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </dd>
-  <button onClick={handleFilter}>Filter</button>
-</dl>
-
+        <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
+          <dt>
+            <a href="#" onClick={toggleDropdown}>
+              <span className="hida">Select Product Category</span>
+              <p className="multiSel">{selectedCategories.join(', ')}</p>
+            </a>
+          </dt>
+          <dd>
+            <div className="mutliSelect">
+              <ul>
+                {categories.map(category => (
+                  <li key={category}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value={category}
+                        checked={selectedCategories.includes(category)}
+                        onChange={handleCategoryChange}
+                      />
+                      {category}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </dd>
+          <button onClick={handleFilter}>Filter</button>
+        </dl>
       </div>
 
       <section className="products-section">
