@@ -1,4 +1,3 @@
-
 import React from 'react';
 import './Navbar.css'; // CSS dosyanı buraya bağla
 
@@ -30,4 +29,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

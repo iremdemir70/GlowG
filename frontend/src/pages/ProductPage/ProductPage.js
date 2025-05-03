@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ProductPage.css';
 import { FaHome } from 'react-icons/fa';
+import Navbar from '../../components/Navbar';
 
 
 export default function ProductPage() {
@@ -84,30 +85,7 @@ categories.forEach(cat => {
 
   return (
     <>
-      <nav className={`nav ${isScrolled ? 'affix' : ''}`}>
-        <div className="container">
-          <div className="logo">
-          <li><a href="#" className="btn-info">GlowGenie</a></li>
-          </div>
-          <div id="mainListDiv" className={`main_list ${menuOpen ? 'show_list' : ''}`}>
-            <ul className="navlinks">
-              <li><a href="#" className="btn-info">About</a></li>
-              <li><a href="#" className="btn-info">Contact</a></li>
-              <li>
-                <button className="btn" onClick={() => window.location.href = 'index.html'}>
-                  <FaHome />
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <span className="navTrigger" onClick={toggleMenu}>
-            <i></i>
-            <i></i>
-            <i></i>
-          </span>
-        </div>
-      </nav>
+      <Navbar /> {/* Navbar componenti burada çağrıldı */}
 
       <main className="main-content">
         <h2 className="section-title">
