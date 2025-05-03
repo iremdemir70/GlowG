@@ -285,6 +285,7 @@ main {
 }
 
 /* Navbar section */
+/*
 @import url('https://fonts.googleapis.com/css?family=Quicksand:400,500,700');
 html,
 body {
@@ -358,11 +359,12 @@ body {
   padding-bottom: 20px;
   -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
-}
+}  */
+  /*
 .btn-nav {
-  display: flex; /* Flexbox aktif */
-  align-items: center; /* Dikey olarak ortalar */
-  justify-content: center; /* Yatay olarak ortalar */
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
   padding: 0;
   width: 300px;
   height: 50px;
@@ -394,7 +396,7 @@ body {
 }
 
 /* Media qurey section */
-
+/*
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   .container {
       margin: 0;
@@ -644,3 +646,4 @@ font-size: 20px;
   padding:2%;
 }
 }
+*/

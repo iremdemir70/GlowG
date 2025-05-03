@@ -80,7 +80,6 @@ body {
   
   /* Seçenekler listesi */
   .filter-section .dropdown dd ul {
-    display: none;       /* jQuery ile açılır */
     list-style: none;
     padding: 5px;
     margin: 5px 0 0 0;
@@ -89,8 +88,13 @@ body {
     max-height: 120px;
     overflow-y: auto;
     box-sizing: border-box;
-  }
+    display: none;  /* Başlangıçta gizli */
+}
   
+/* Dropdown açıldığında */
+.filter-section .dropdown.open dd ul {
+    display: block; /* Dropdown açıldığında göster */
+}
   /* Her bir seçenek */
   .filter-section .dropdown dd ul li {
     margin: 5px 0;

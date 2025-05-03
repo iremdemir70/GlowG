@@ -1,114 +1,157 @@
-import React, { useState } from "react";
-import "./SkinTypeTest.css";
-const baseUrl = "http://localhost:5000"; // bu doğru
-
+import React, { useState } from 'react';
+import './SkinTypeTest.css';
 
 function SkinTypeTest() {
-  const [answers, setAnswers] = useState({});
-  const [showResult, setShowResult] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [answers, setAnswers] = useState(Array(8).fill("")); // 8 soruluk cevaplar
+  const [error, setError] = useState(false);
+  const [result, setResult] = useState(null);
 
-  const totalQuestions = 8;
-
-  const handleChange = (e) => {
-    setAnswers({ ...answers, [e.target.name]: e.target.value });
+  const handleAnswerChange = (questionIndex, answer) => {
+    const newAnswers = [...answers];
+    newAnswers[questionIndex] = answer;
+    setAnswers(newAnswers);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (Object.keys(answers).length < totalQuestions) {
-      setShowError(true);
-      setShowResult(false);
+    if (answers.every(answer => answer !== "")) {
+      // Burada örnek bir hesaplama yerine sadece yazı koyduk
+      setResult("Calculated Skin Type");
+      setError(false);
     } else {
-      setShowError(false);
-      setShowResult(true);
+      setError(true);
+      setResult(null);
     }
+  };
+
+
+  const Question = ({ question, options, questionIndex }) => {
+    return (
+      <div className="question">
+        <label>{question}</label>
+        <div className="options">
+          {options.map((option, index) => (
+            <label key={index}>
+              <input
+                type="radio"
+                name={`q${questionIndex}`}
+                value={option}
+                checked={answers[questionIndex] === option}
+                onChange={() => handleAnswerChange(questionIndex, option)}
+              />
+              {option}
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const questions = [
+    {
+      question: "1. How often does your skin feel oily or shiny, especially in the T-zone?",
+      options: ["Always", "Rarely", "Sometimes", "Frequently"]
+    },
+    {
+      question: "2. Does your skin feel tight, dry, or flaky after cleansing?",
+      options: ["Always", "Often", "Occasionally", "Never"]
+    },
+    {
+      question: "3. How do moisturizers make your skin feel?",
+      options: [
+        "Feel perfectly hydrated",
+        "Feel greasy and sticky",
+        "Feel slightly oily in some areas but fine in others",
+        "Absorb quickly without feeling greasy"
+      ]
+    },
+    {
+      question: "4. Do you often experience blackheads or acne in your T-zone?",
+      options: ["Always", "Frequently", "Occasionally", "Never"]
+    },
+    {
+      question: "5. How does your skin feel after waking up in the morning?",
+      options: [
+        "Perfectly balanced",
+        "Dry or tight",
+        "Normal in some areas but oily in the T-zone",
+        "Greasy or shiny all over"
+      ]
+    },
+    {
+      question: "6. How does your skin react to seasonal changes?",
+      options: [
+        "No noticeable change",
+        "Drier in winter, normal in summer",
+        "Normal in winter, oily in summer",
+        "Oily regardless of season"
+      ]
+    },
+    {
+      question: "7. Does your skin feel balanced throughout the day?",
+      options: ["Always", "Occasionally", "Rarely", "Never"]
+    },
+    {
+      question: "8. How does your U-zone (cheeks/jawline) typically feel?",
+      options: [
+        "Very oily",
+        "Slightly oily",
+        "Normal",
+        "Dry or tight"
+      ]
+    }
+  ];
+
+  const Result = ({ result }) => {
+    return (
+      <div className="result">
+        <p>Your skin type is... <span>{result}</span></p>
+      </div>
+    );
   };
 
   return (
     <div className="container">
-      <div className="top-bar">
-        <h2 className="logo">Glow Genie</h2>
-        <button className="btn" onClick={() => window.location.href = "/"}>
-          <i className="fa fa-home"></i>
-        </button>
-      </div>
+  
+  {/* HEADER BLOĞU */}
+<div className="top-bar">
+  <div className="logo">Glow Genie</div>
+</div>
 
-      <p className="instruction"><strong>Discover Your Skin Type</strong></p>
-      <p className="sub-instruction">
-        Answer a few questions to find out which skin type matches you best.
-      </p>
-
+{/* BAŞLIK VE AÇIKLAMA */}
+<div className="intro-section">
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <h1 className="instruction">Discover Your Skin Type</h1>
+    <button className="btn" onClick={() => window.location.href = '/'}>
+      <i className="fa fa-home"></i>
+    </button>
+  </div>
+  <p className="sub-instruction">
+    Answer a few questions to find out which skin type matches you best. It only takes a few minutes!
+  </p>
+</div>
+  
+      {/* SORULAR VE FORM */}
       <form onSubmit={handleSubmit}>
-        <div className="questions-container">
-          {Array.from({ length: totalQuestions }, (_, i) => {
-            const qNumber = i + 1;
-            const questionText = getQuestionText(qNumber);
-            const options = getQuestionOptions(qNumber);
-            return (
-              <div key={qNumber} className="question">
-                <label>{`${qNumber}. ${questionText}`}</label>
-                <div className="options">
-                  {options.map((opt, idx) => (
-                    <label key={idx}>
-                      <input
-                        type="radio"
-                        name={`q${qNumber}`}
-                        value={opt}
-                        checked={answers[`q${qNumber}`] === opt}
-                        onChange={handleChange}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
+        {questions.map((q, index) => (
+          <Question
+            key={index}
+            question={q.question}
+            options={q.options}
+            questionIndex={index}
+          />
+        ))}
+  
+        {/* HATA MESAJI */}
+        {error && <p className="error-message">Please fill in all questions.</p>}
+  
+        {/* SUBMIT BUTONU */}
         <button type="submit" className="submit-btn">Submit</button>
-
-        {showError && (
-          <p className="error-message">Please fill in the mandatory areas.</p>
-        )}
-
-        {showResult && (
-          <p className="result">
-            Your skin type is... <span>[Calculated Type]</span>
-          </p>
-        )}
       </form>
-    </div>
+  
+      {/* SONUÇ */}
+      {result && <Result result={result} />}
+    </div>
   );
 }
-
-function getQuestionText(num) {
-  const questions = {
-    1: "How often does your skin feel oily or shiny, especially in the T-zone (forehead, nose, and chin)?",
-    2: "Does your skin feel tight, dry, or flaky after cleansing?",
-    3: "How do moisturizers make your skin feel?",
-    4: "Do you often experience blackheads or acne, especially in your T-zone?",
-    5: "How does your skin feel after waking up in the morning?",
-    6: "How does your skin react to seasonal changes?",
-    7: "Does your skin feel comfortable and balanced throughout the day?",
-    8: "How does your U-zone (cheeks and jawline) typically feel?"
-  };
-  return questions[num];
-}
-
-function getQuestionOptions(num) {
-  const options = {
-    1: ["Always", "Rarely", "Sometimes", "Frequently"],
-    2: ["Always", "Often", "Occasionally", "Never"],
-    3: ["Feel perfectly hydrated", "Feel greasy and sticky", "Feel slightly oily in some areas but fine in others", "Absorb quickly without feeling greasy"],
-    4: ["Always", "Frequently", "Occasionally", "Never"],
-    5: ["Feels perfectly balanced", "Feels dry or tight", "Feels normal in some areas but oily in the T-zone", "Feels greasy or shiny all over"],
-    6: ["No noticeable change", "Feels drier in winter, normal in summer", "Feels normal in winter, oily in summer", "Feels oily or greasy regardless of season"],
-    7: ["Always", "Occasionally", "Rarely", "Never"],
-    8: ["Very oily throughout the day", "Slightly oily by the end of the day", "Normal, neither oily nor dry", "Dry or tight most of the time"]
-  };
-  return options[num];
-}
-
 export default SkinTypeTest;

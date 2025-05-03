@@ -3,11 +3,20 @@ import './ProductPage.css';
 import { FaHome } from 'react-icons/fa';
 
 const categories = ["Cleanser", "Moisturizer", "Sunscreen", "Serum", "Toner"];
+const products = [
+  { id: 1, name: 'Product 1', category: 'Cleanser', price: '$20' },
+  { id: 2, name: 'Product 2', category: 'Moisturizer', price: '$30' },
+  { id: 3, name: 'Product 3', category: 'Sunscreen', price: '$25' },
+  { id: 4, name: 'Product 4', category: 'Serum', price: '$40' },
+  { id: 5, name: 'Product 5', category: 'Toner', price: '$15' },
+  // Diğer ürünler buraya eklenebilir
+];
 
 export default function ProductPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown menüsünün açık olup olmadığı
 
   const handleCategoryChange = (event) => {
     const value = event.target.value;
@@ -31,10 +40,19 @@ export default function ProductPage() {
     setMenuOpen(prev => !prev);
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen(prev => !prev);
+  };
+
   const handleFilter = () => {
     // Ürünleri filtreleme işlemi burada yapılabilir
     console.log("Filtering for:", selectedCategories);
   };
+
+  // Seçilen kategorilere göre filtrelenmiş ürünleri al
+  const filteredProducts = products.filter(product =>
+    selectedCategories.length === 0 || selectedCategories.includes(product.category)
+  );
 
   return (
     <>
@@ -70,39 +88,45 @@ export default function ProductPage() {
       </main>
 
       <div className="filter-section">
-        <dl className="dropdown">
-          <dt>
-            <a href="#">
-              <span className="hida">Select Product Category</span>
-              <p className="multiSel">{selectedCategories.join(', ')}</p>
-            </a>
-          </dt>
-          <dd>
-            <div className="mutliSelect">
-              <ul>
-                {categories.map(category => (
-                  <li key={category}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        value={category}
-                        checked={selectedCategories.includes(category)}
-                        onChange={handleCategoryChange}
-                      />
-                      {category}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </dd>
-          <button onClick={handleFilter}>Filter</button>
-        </dl>
+      <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
+  <dt>
+    <a href="#" onClick={toggleDropdown}>
+      <span className="hida">Select Product Category</span>
+      <p className="multiSel">{selectedCategories.join(', ')}</p>
+    </a>
+  </dt>
+  <dd>
+    <div className="mutliSelect">
+      <ul>
+        {categories.map(category => (
+          <li key={category}>
+            <label>
+              <input
+                type="checkbox"
+                value={category}
+                checked={selectedCategories.includes(category)}
+                onChange={handleCategoryChange}
+              />
+              {category}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </dd>
+  <button onClick={handleFilter}>Filter</button>
+</dl>
+
       </div>
 
       <section className="products-section">
         <div id="product-list" className="products-container">
-          {/* Ürün kartları burada listelenebilir */}
+          {filteredProducts.map(product => (
+            <div key={product.id} className="product-card">
+              <h3>{product.name}</h3>
+              <p>{product.category}</p>
+            </div>
+          ))}
         </div>
         <button id="view-more-btn" className="view-more-btn">View More</button>
       </section>
