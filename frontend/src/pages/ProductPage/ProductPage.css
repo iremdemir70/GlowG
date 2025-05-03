@@ -24,7 +24,7 @@ body {
   }
 
   .main-content {
-    padding-top: 120px; /* nav'dan sonra boşluk */
+    padding-top: 120px; /* nav'dan sonra boÅŸluk */
     padding-left: 30px; /* sola hizalama */
 }
 
@@ -38,18 +38,18 @@ body {
 
 /* === Genel Ayarlar === */
 .filter-section {
-    margin-left: 30px;   /* Başlığın sola hizasına uygun */
-    margin-top: 20px;    /* Başlık ile dropdown arasında mesafe */
+    margin-left: 30px;   /* BaÅŸlÄ±ÄŸÄ±n sola hizasÄ±na uygun */
+    margin-top: 20px;    /* BaÅŸlÄ±k ile dropdown arasÄ±nda mesafe */
   }
   
-  /* === Dropdown Odağı === */
+  /* === Dropdown OdaÄŸÄ± === */
   .filter-section .dropdown {
-    display: block;      /* Akış içinde alt alta gelir */
-    width: 300px;        /* Sabit genişlik */
-    margin-bottom: 15px; /* Filter butonuna kadar boşluk */
+    display: block;      /* AkÄ±ÅŸ iÃ§inde alt alta gelir */
+    width: 300px;        /* Sabit geniÅŸlik */
+    margin-bottom: 15px; /* Filter butonuna kadar boÅŸluk */
   }
   
-  /* Başlık linki (Select kutusu) */
+  /* BaÅŸlÄ±k linki (Select kutusu) */
   .filter-section .dropdown dt a,
   .filter-section .dropdown dt a:visited {
     display: block;
@@ -68,17 +68,17 @@ body {
     cursor: pointer;
   }
   
-  /* Placeholder “Select” yazısı */
+  /* Placeholder â€œSelectâ€ yazÄ±sÄ± */
   .filter-section .dropdown dt a .hida {
     color: #6b2e87;
   }
   
-  /* Açılır liste kapsayıcısı */
+  /* AÃ§Ä±lÄ±r liste kapsayÄ±cÄ±sÄ± */
   .filter-section .dropdown dd {
     position: relative;
   }
   
-  /* Seçenekler listesi */
+  /* SeÃ§enekler listesi */
   .filter-section .dropdown dd ul {
     list-style: none;
     padding: 5px;
@@ -88,14 +88,14 @@ body {
     max-height: 120px;
     overflow-y: auto;
     box-sizing: border-box;
-    display: none;  /* Başlangıçta gizli */
+    display: none;  /* BaÅŸlangÄ±Ã§ta gizli */
 }
   
-/* Dropdown açıldığında */
+/* Dropdown aÃ§Ä±ldÄ±ÄŸÄ±nda */
 .filter-section .dropdown.open dd ul {
-    display: block; /* Dropdown açıldığında göster */
+    display: block; /* Dropdown aÃ§Ä±ldÄ±ÄŸÄ±nda gÃ¶ster */
 }
-  /* Her bir seçenek */
+  /* Her bir seÃ§enek */
   .filter-section .dropdown dd ul li {
     margin: 5px 0;
   }
@@ -113,7 +113,7 @@ body {
     cursor: pointer;
   }
   
-  /* Seçenek hover efekti */
+  /* SeÃ§enek hover efekti */
   .filter-section .dropdown dd ul li:hover {
     background-color: #fff;
     border-radius: 6px;
@@ -161,8 +161,8 @@ body {
   
   /* View More butonu */
   #view-more-btn {
-    display: block;           /* block yaparak margin:auto çalıştır */
-    margin: 30px auto 0 auto; /* üstte 30px boşluk, yanyana ortalanır */
+    display: block;           /* block yaparak margin:auto Ã§alÄ±ÅŸtÄ±r */
+    margin: 30px auto 0 auto; /* Ã¼stte 30px boÅŸluk, yanyana ortalanÄ±r */
     padding: 10px 20px;
     background-color: #6b2e87;
     color: #fff;
@@ -170,7 +170,7 @@ body {
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    width: fit-content;       /* içeriğe göre genişlik alır */
+    width: fit-content;       /* iÃ§eriÄŸe gÃ¶re geniÅŸlik alÄ±r */
   }
   
   #view-more-btn:hover {
@@ -523,4 +523,3 @@ body {
     }
   }
   
-
