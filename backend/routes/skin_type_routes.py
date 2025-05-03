@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 import joblib
 import pandas as pd
+from models.user import User
+from database.db import db
 
 skin_bp = Blueprint('skin_bp', __name__)
 
@@ -72,6 +74,7 @@ CHOICE_MAP = {
             'schema': {
                 'type': 'object',
                 'properties': {
+                    'user_id': {'type': 'integer'},  # Bunu ekle
                     'Q1': {'type': 'string'},
                     'Q2': {'type': 'string'},
                     'Q3': {'type': 'string'},
@@ -81,7 +84,7 @@ CHOICE_MAP = {
                     'Q7': {'type': 'string'},
                     'Q8': {'type': 'string'}
                 },
-                'required': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8']
+                'required': ['user_id', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8']
             }
         }
     ],
@@ -96,27 +99,39 @@ CHOICE_MAP = {
         500: {'description': 'Sunucu hatası'}
     }
 })
+
 def predict_skin_type():
     try:
         data = request.get_json()
-
         if not data:
             return jsonify({'error': 'Eksik veri'}), 400
 
-        mapped_data = map_user_inputs(data)
-        user_df = pd.DataFrame([mapped_data])
+        user_id = data.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'user_id gerekli'}), 400
 
+        # Soruları ayıkla
+        question_answers = {k: v for k, v in data.items() if k.startswith('Q')}
+        mapped_data = map_user_inputs(question_answers)
+        user_df = pd.DataFrame([mapped_data])
         user_df_encoded = pd.get_dummies(user_df)
 
         for col in EXPECTED_COLUMNS:
             if col not in user_df_encoded.columns:
                 user_df_encoded[col] = 0
-
         user_df_encoded = user_df_encoded[EXPECTED_COLUMNS]
 
-        prediction = model.predict(user_df_encoded)[0]
+        prediction = int(model.predict(user_df_encoded)[0])
 
-        return jsonify({'prediction': int(prediction)})
+        # Kullanıcıyı bul ve güncelle
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'Kullanıcı bulunamadı'}), 404
+
+        user.skin_type_id = prediction
+        db.session.commit()
+
+        return jsonify({'prediction': prediction, 'updated_user_id': user_id})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
