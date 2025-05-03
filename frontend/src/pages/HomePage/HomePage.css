@@ -1,0 +1,353 @@
+@import url('https://fonts.googleapis.com/css?family=Quicksand:400,500,700');
+
+/* Genel Ayarlar */
+html {
+    font-size: 62.5%; /* 1rem = 10px */
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: "Quicksand", Arial, sans-serif;
+    background: linear-gradient(to right, #f3e7e9, #e3eeff);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Genel Genişlik Sınırlamaları */
+header, main, .login, #profileCard {
+    max-width: 1200px;
+    width: 90%;
+}
+
+/* Üst Menü */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+}
+
+header h1 {
+    font-size: 2.8rem;
+    font-weight: bold;
+}
+
+/* Ana İçerik */
+main {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+/* Login Alanı */
+.login {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 3rem;
+    border-radius: 2rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    margin-top: 5rem;
+}
+
+.login h2 {
+    color: #5a0080;
+    font-size: 2rem;
+}
+
+.login input {
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid #c797eb;
+    border-radius: 1rem;
+    font-size: 1.4rem;
+}
+
+.login-btn {
+    background-color: #c797eb;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1.4rem;
+}
+
+.login-btn:hover {
+    background-color: #a05fcf;
+}
+
+.login-warning {
+    color: red;
+    font-size: 1.4rem;
+}
+
+/* Register ve Forgot Password */
+.forgot-password, .register a {
+    color: #5a0080;
+    text-decoration: none;
+    font-size: 1.4rem;
+}
+
+.forgot-password:hover, .register a:hover {
+    text-decoration: underline;
+}
+
+/* Option Button */
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 5rem;
+}
+
+.option-btn {
+    width: 25rem;
+    height: 8rem;
+    background-color: transparent;
+    border: 2px solid #c797eb;
+    color: #5a0080;
+    font-size: 1.6rem;
+    font-weight: bold;
+    border-radius: 2rem;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    background-color: #c797eb;
+    color: white;
+}
+
+/* Profile Card */
+#profileCard {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 3rem;
+    border-radius: 2rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    margin-top: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#profileCard h2 {
+    color: #5a0080;
+    margin-bottom: 2rem;
+}
+
+#profileCard input,
+#profileCard select {
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid #c797eb;
+    border-radius: 1rem;
+    font-size: 1.4rem;
+}
+
+#profileCard button {
+    background-color: #c797eb;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    font-size: 1.4rem;
+}
+
+#profileCard button:hover {
+    background-color: #a05fcf;
+}
+
+/* Pop-up */
+.popup {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    width: 50rem;
+    background-color: #fff;
+    border: 1rem solid #f5dbed;
+    border-radius: 2rem;
+    padding: 2rem;
+    z-index: 1000;
+    box-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.popup-description {
+    font-size: 1.6rem;
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.popup-btn-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+}
+
+.popup-buttons button {
+    padding: 1rem;
+    border: none;
+    background-color: #c797eb;
+    color: white;
+    border-radius: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 1rem;
+    width: 100%;
+    font-size: 1.4rem;
+}
+
+.popup-buttons button:hover {
+    background-color: #5a0080;
+}
+
+.popup-btn-container p {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #666;
+}
+
+/* Navbar */
+.nav {
+    width: 100%;
+    height: 6.5rem;
+    position: fixed;
+    line-height: 6.5rem;
+    text-align: center;
+    padding: 2rem 0;
+    transition: all 0.4s ease;
+}
+
+.nav .logo {
+    float: left;
+    padding-left: 3rem;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 2.8rem;
+}
+
+.nav .logo a {
+    text-decoration: none;
+    color: #6b2e87;
+    transition: color 0.3s ease;
+}
+
+.nav .logo a:hover {
+    color: #c797eb;
+}
+
+.nav div.main_list ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 6.5rem;
+}
+
+.nav div.main_list ul li {
+    padding-right: 3rem;
+}
+
+.nav div.main_list ul li a {
+    font-size: 2.4rem;
+    text-decoration: none;
+    line-height: 6.5rem;
+}
+
+/* Navigation Button */
+.btn-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30rem;
+    height: 5rem;
+    background-color: #6b2e87;
+    color: white;
+    text-decoration: none;
+    border-radius: 1.5rem;
+    font-size: 1.6rem;
+    transition: background 0.3s ease;
+}
+
+.btn-nav:hover {
+    background-color: #c797eb;
+}
+
+.btn-info:hover {
+    color: #c797eb;
+}
+
+/* Responsive Düzen */
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logincard,
+    .options,
+    #profileCard {
+        width: 90%;
+        margin-top: 2rem;
+    }
+
+    .option-btn {
+        width: 100%;
+        padding: 1.5rem;
+        font-size: 1.6rem;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .popup {
+        width: 90%;
+        top: 20%;
+        transform: translate(-50%, -20%);
+        padding: 1.5rem;
+    }
+
+    .popup-buttons {
+        flex-direction: column;
+    }
+
+    .popup-btn-container {
+        width: 100%;
+        text-align: center;
+    }
+
+    .popup-buttons button {
+        font-size: 1.4rem;
+    }
+}
+
+/* Gizli Alan */
+.hidden {
+    display: none;
+}

@@ -166,17 +166,17 @@ const RegisterForm = () => {
           </label>
 
           <div className="button-group">
-            <button type="submit" className="submit-btn">
-              Submit
-            </button>
-            <button
-              type="button"
-              className="cancel-btn"
-              onClick={() => navigate("/")}
-            >
-              Cancel
-            </button>
-          </div>
+        <button type="submit" className="form-btn">
+          Submit
+        </button>
+        <button
+          type="button"
+          className="form-btn"
+          onClick={() => navigate("/")}
+        >
+          Cancel
+        </button>
+      </div>
 
           {errors.mandatory && (
             <p className="error-text">Please fill in the mandatory areas.</p>

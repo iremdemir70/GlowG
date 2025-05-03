@@ -1,30 +1,23 @@
 import React from 'react';
-import './Navbar.css'; // CSS dosyanı buraya bağla
+import './Navbar.css';
 
 const Navbar = () => {
   return (
-    <div className="nav">
-      <input type="checkbox" id="nav-check" />
-      
-      <div className="nav-header">
-        <a href="#" className="logo">Glow Genie</a>
-      </div>
-
-      <div className="nav-btn">
-        <label htmlFor="nav-check">
-          <span></span>
-          <span></span>
-          <span></span>
-        </label>
-      </div>
-
-      <div className="nav-links">
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-        <a href="#">Home Page</a>
-    
-      </div>
-    </div>
+    <nav className="navbar">
+      <div className="navbar-logo">Glow Genie</div>
+      <input type="checkbox" id="menu-toggle" />
+      <label htmlFor="menu-toggle" className="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+      <ul className="navbar-links">
+        <li><a href="#">Show All Skin Care Products</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="/">Home</a></li>
+      </ul>
+    </nav>
   );
 };
 

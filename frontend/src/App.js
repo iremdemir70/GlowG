@@ -7,6 +7,9 @@ import SkinTypeTest from './pages/SkinTypeTest/SkinTypeTest';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword/UpdatePassword';
 import RegisterVerification from './pages/RegisterVerification/RegisterVerification';
+import HomePage from './pages/HomePage/HomePage'; // Bu şekilde güncelleyin
+
+
 
 function App() {
   return (
@@ -24,7 +27,8 @@ function MainLayout() {
     '/skin-type',
     '/update-password',
     '/forgot-password',
-    '/register-verification'
+    '/register-verification',
+    '/register'
   ];
 
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
@@ -33,6 +37,7 @@ function MainLayout() {
     <>
       {!shouldHideNavbar && <Navbar />}
       <Routes>
+        <Route path="/" element={<HomePage />} /> {/* ✅ HomePage rotası eklendi */}
         <Route path="/products" element={<ProductPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/skin-type" element={<SkinTypeTest />} />
