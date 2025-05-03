@@ -30,6 +30,34 @@ def get_users():
     return jsonify(user_list)
 
 
+# GET user by ID
+@auth_bp.route('/users/<int:user_id>', methods=['GET'])
+@swag_from({
+    'tags': ['User'],
+    'parameters': [
+        {
+            'name': 'user_id',
+            'in': 'path',
+            'type': 'integer',
+            'required': True,
+            'description': 'Kullanıcının ID değeri'
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Kullanıcı bilgileri başarıyla döndürüldü'
+        },
+        404: {
+            'description': 'Kullanıcı bulunamadı'
+        }
+    }
+})
+def get_user_by_id(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return jsonify(user.to_dict()), 200
+    return jsonify({"message": "User not found"}), 404
+
 
 # register user
 @auth_bp.route('/register', methods=['POST'])
@@ -47,6 +75,10 @@ def get_users():
                     'password': {'type': 'string'},
                     'skin_type_id': {'type': 'integer'},
                     'skin_tone_id': {'type': 'integer'},
+                    'allergens': {
+                        'type': 'array',
+                        'items': {'type': 'string'}
+                    }
                 },
                 'required': ['email', 'password']
             }
@@ -67,6 +99,7 @@ def register_user():
     password = data.get('password')
     skin_type_id = data.get('skin_type_id')
     skin_tone_id = data.get('skin_tone_id')
+    allergens = data.get('allergens', [])  # 👈 varsayılan boş liste
 
     if not email or not password:
         return {'message': 'Email ve şifre gerekli'}, 400
@@ -77,17 +110,18 @@ def register_user():
         email=email,
         password=hashed_password,
         skin_type_id=skin_type_id,
-        skin_tone_id=skin_tone_id
+        skin_tone_id=skin_tone_id,
+        allergens=allergens  # 👈 yeni alan
     )
     db.session.add(new_user)
     db.session.commit()
 
-    # Mail sender
+    # Doğrulama maili gönder
     msg = Message(
-    subject="GlowGenie Hesabını Doğrula",
-    sender=current_app.config['MAIL_USERNAME'],
-    recipients=[email],
-    body=f"Merhaba {email},\n\nLütfen hesabını doğrulamak için şu bağlantıya tıkla:\nhttp://127.0.0.1:5000/verify/{email}"
+        subject="GlowGenie Hesabını Doğrula",
+        sender=current_app.config['MAIL_USERNAME'],
+        recipients=[email],
+        body=f"Merhaba {email},\n\nLütfen hesabını doğrulamak için şu bağlantıya tıkla:\nhttp://127.0.0.1:5000/verify/{email}"
     )
     mail.send(msg)
 
@@ -133,18 +167,25 @@ def verify_email(email):
     ],
     'responses': {
         200: {'description': 'Giriş başarılı'},
-        401: {'description': 'Geçersiz kimlik bilgileri'}
+        401: {'description': 'Geçersiz kimlik bilgileri'},
+        403: {'description': 'Hesap doğrulanmamış'}
     }
 })
 def login_user():
     data = request.get_json()
-    print("POST DATA:", data)
     email = data.get('email')
     password = data.get('password')
 
     user = User.query.filter_by(email=email).first()
-    print("USER:", user)
-    if user and bcrypt.check_password_hash(user.password, password):
-        return {'message': 'Giriş başarılı', 'user_id': user.user_id}, 200
-    else:
+    if not user:
         return {'message': 'Geçersiz email veya şifre'}, 401
+
+    if not bcrypt.check_password_hash(user.password, password):
+        return {'message': 'Geçersiz email veya şifre'}, 401
+
+    if not user.is_verified:
+        return {
+            'message': 'Lütfen mailinize gelen onay bağlantısını tıklayarak hesabınızı doğrulayın.'
+        }, 403
+
+    return {'message': 'Giriş başarılı', 'user_id': user.user_id}, 200

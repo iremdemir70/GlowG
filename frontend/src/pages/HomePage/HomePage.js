@@ -1,5 +1,5 @@
 // src/pages/HomePage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // yönlendirme için eklendi
 import './HomePage.css';
 
@@ -7,6 +7,13 @@ const HomePage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate(); // useNavigate hook'u
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [userData, setUserData] = useState(null);
+
+
 
   const goToHomePage = () => {
     navigate('/');
@@ -17,9 +24,47 @@ const HomePage = () => {
   };
 
   const login = () => {
-    setIsLoggedIn(true);
-    alert("Login Successful!");
+    fetch("http://127.0.0.1:5000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(err => {
+            throw new Error(err.message || "Login failed");
+          });
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Login success:", data);
+        setIsLoggedIn(true);
+        setLoginError('');
+        setUserId(data.user_id); // 👈 burada geliyor
+        alert("Login Successful!");
+      })
+      .catch(err => {
+        console.error("Login failed:", err.message);
+        setLoginError(err.message || "Invalid credentials");
+      });
   };
+  
+  
+  useEffect(() => {
+    if (userId) {
+      fetch(`http://127.0.0.1:5000/users/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("Fetched user data:", data);
+          setUserData(data);
+        })
+        .catch(err => console.error("User data fetch failed:", err));
+    }
+  }, [userId]);
+  
 
   const logout = () => {
     setIsLoggedIn(false);
@@ -76,22 +121,37 @@ const HomePage = () => {
             <section className="login" id="loginCard">
               <h2>Login</h2>
               <form>
-                <label htmlFor="email">E-mail*</label>
-                <input type="email" id="email" required />
+              <label htmlFor="email">E-mail*</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
 
-                <label htmlFor="password">Password*</label>
-                <input type="password" id="password" required />
+              <label htmlFor="password">Password*</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
 
-                <a href="/ForgotPassword" className="forgot-password">
-                  Forgot Password?
-                </a>
+              {loginError && <p style={{ color: "red" }}>{loginError}</p>}
 
-                <br />
-                <br />
-                <button type="button" className="login-btn" onClick={login}>
-                  Login
-                </button>
-              </form>
+              <a href="/ForgotPassword" className="forgot-password">
+                Forgot Password?
+              </a>
+
+              <br />
+              <br />
+              <button type="button" className="login-btn" onClick={login}>
+                Login
+              </button>
+            </form>
+
               <p className="register">
                 Don't have an account? <a href="/register">Register Here</a>
               </p>
@@ -99,28 +159,45 @@ const HomePage = () => {
           ) : (
             <div id="profileCard">
               <h2>Profile</h2>
-              <input type="email" id="profileEmail" placeholder="E-mail" readOnly />
-              <select id="skinType">
-                <option>Oily</option>
-                <option>Dry</option>
-                <option>Normal</option>
-                <option>Combination</option>
-                <option>I don't know</option>
+
+              <input
+                type="email"
+                id="profileEmail"
+                value={userData?.email || ""}
+                readOnly
+              />
+
+              <select id="skinType" value={userData?.skin_type_name || ""} disabled>
+                <option value="Oily">Oily</option>
+                <option value="Dry Skin">Dry Skin</option>
+                <option value="Normal">Normal</option>
+                <option value="Combination">Combination</option>
+                <option value="I don't know">I don't know</option>
               </select>
-              <select id="skinTone">
-                <option>Light Skin</option>
-                <option>Medium Skin</option>
-                <option>Dark Skin</option>
-              </select>
-              <input type="text" placeholder="Allergens: Paraben, Alcohol, etc." />
+
+              <select id="skinTone" value={userData?.skin_tone_name || ""} disabled>
+              <option value="Light Skin">Light Skin</option>
+              <option value="Medium Skin">Medium Skin</option>
+              <option value="Dark Skin">Dark Skin</option>
+            </select>
+
+              <input
+                type="text"
+                value={(userData?.allergens || []).join(', ')}
+                placeholder="Allergens: Paraben, Alcohol, etc."
+                readOnly
+              />
+
               <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
-                <a href="/UpdatePassword" id="changePasswordLink" style={{ display: 'inline-block' }}>
+                <a href="/UpdatePassword" id="changePasswordLink">
                   Change Password
                 </a>
               </div>
+
               <button>Update</button>
               <button onClick={logout}>Log Out</button>
             </div>
+
           )}
         </main>
       </div>
