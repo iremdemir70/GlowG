@@ -94,53 +94,54 @@ categories.forEach(cat => {
       </main>
 
       <div className="filter-section">
-      <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
-      <dt>
-  {/* eski: <a href="#" onClick={toggleDropdown}> */}
-  <button type="button" onClick={toggleDropdown} className="dropdown-toggle">
-    <span className="hida">Select Product Category</span>
-    <p className="multiSel">{selectedCategories.join(', ')}</p>
-  </button>
-</dt>
-
-  <dd>
-    <div className="mutliSelect">
-      <ul>
-      {categories.map(category => (
-          <li key={category.category_id}>
-            <label>
-              <input
-                type="checkbox"
-                value={category.category_name}
-                checked={selectedCategories.includes(category.category_name)}
-                onChange={handleCategoryChange}
-              />
-              {category.category_name}
-            </label>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </dd>
-  <button onClick={handleFilter}>Filter</button>
-</dl>
-
-      </div>
-
-      <section className="products-section">
-        <div id="product-list" className="products-container">
-        {filteredProducts.slice(0, visibleCount).map(product => (
-            <div key={product.product_id} className="product-card">
-              <h3>{product.product_name}</h3>
-            </div>
+  <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
+    <dt>
+      <a href="#" onClick={toggleDropdown}>
+        <span className="hida">Select Product Category</span>
+        <p className="multiSel">{selectedCategories.join(', ')}</p>
+      </a>
+    </dt>
+    <dd>
+      <div className="mutliSelect">
+        <ul>
+          {categories.map(category => (
+            <li key={category.category_id}>
+              <label>
+                <input
+                  type="checkbox"
+                  value={category.category_name}
+                  checked={selectedCategories.includes(category.category_name)}
+                  onChange={handleCategoryChange}
+                />
+                {category.category_name}
+              </label>
+            </li>
           ))}
+        </ul>
+      </div>
+    </dd>
+    <button onClick={handleFilter}>Filter</button>
+  </dl>
+</div>
 
 
-        </div>
-        {visibleCount < filteredProducts.length && (
-          <button id="view-more-btn" onClick={handleViewMore}>View More</button>
-        )}
-      </section>
+<section className="products-section">
+  <div id="product-list" className="products-container">
+    {filteredProducts.slice(0, visibleCount).map(product => (
+      <div key={product.product_id} className="product-card">
+        <h3>{product.product_name}</h3>
+        <p>{categoryMap[product.category_id]}</p>
+      </div>
+    ))}
+  </div>
+  
+  {visibleCount < filteredProducts.length && (
+    <button id="view-more-btn" className="view-more-btn" onClick={handleViewMore}>
+      View More
+    </button>
+  )}
+</section>
+
 
       <div style={{ height: '1000px' }} />
     </>
