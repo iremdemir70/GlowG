@@ -24,16 +24,16 @@ def save_exist_ingredients(product_id, product_ingredients):
         else:
             exist.is_exist = is_exist  
     db.session.commit()
-def export_ingredients_to_csv(ingredients_list, product_name):
-    import os
-    import pandas as pd
+# def export_ingredients_to_csv(ingredients_list, product_name):
+#     import os
+#     import pandas as pd
 
-    folder_path = "csv_files"
-    os.makedirs(folder_path, exist_ok=True)
+#     folder_path = "csv_files"
+#     os.makedirs(folder_path, exist_ok=True)
 
-    filename = f"{product_name}_ingredients.csv".replace(" ", "_").lower()
-    file_path = os.path.join(folder_path, filename)
+#     filename = f"{product_name}_ingredients.csv".replace(" ", "_").lower()
+#     file_path = os.path.join(folder_path, filename)
 
-    df = pd.DataFrame({"ingredient_name": ingredients_list})
-    df.to_csv(file_path, index=False)
-    return file_path
+#     df = pd.DataFrame({"ingredient_name": ingredients_list})
+#     df.to_csv(file_path, index=False)
+#     return file_path
