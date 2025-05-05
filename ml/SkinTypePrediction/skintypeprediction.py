@@ -38,39 +38,42 @@ standard_map = {
     'combination (karma)': 'combination'
 }
 
+
 data['SkinType'] = data['SkinType'].replace(standard_map)
 
 data = data[data.columns[1:].tolist() + [data.columns[0]]]
 
 #encoding
-data_encoded = pd.get_dummies(data.drop(columns='SkinType'))
+X = pd.get_dummies(data.drop(columns='SkinType'))
 
+#target encoding
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(data['SkinType'])
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+#comb. skin type is dominating the other types, since the other skin types distribute equally
+#I will apply L2 regularization
+
+model = LogisticRegression(
+    solver='lbfgs',
+    penalty='l2',
+    C=1.0,
+    max_iter=1000
+)
+model.fit(X_train, y_train)
+
+#saving the model
+joblib.dump((model, X.columns.tolist(), label_encoder), 'skintypeprediction.pkl')
 #sns.countplot(x='SkinType', data=data)
 #plt.title('Distribution of Skin Types')
 #plt.xlabel('Skin Type')
 #plt.ylabel('Count')
 #plt.show()
 
-#comb. skin type is dominating the other types, since the other skin types distribute equally
-#I will apply L2 regularization
-
-#splitting features and target
-X = data_encoded
-y = data['SkinType']
-
-#encoding skintype
-label_encoder = LabelEncoder()
-y_encoded = label_encoder.fit_transform(y)
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
-
-model = LogisticRegression(
-    solver='lbfgs',
-    penalty='l2',     #L2 regularization
-    C=1.0,
-    max_iter=1000
-)
 
 """
 log_reg = LogisticRegression(solver='lbfgs', penalty='l2', max_iter=1000)
@@ -93,18 +96,6 @@ grid_search.fit(X, y)
 print("Best C:", grid_search.best_params_['C'])
 print("Best cross-validated accuracy:", grid_search.best_score_)
 """
-
-model.fit(X_train, y_train)
-
-y_pred = model.predict(X_test)
-
-#evaluation
-#print("Accuracy:", accuracy_score(y_test, y_pred))
-#print("\nClassification Report:\n", classification_report(y_test, y_pred))
-#print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
-
-feature_order = X_train.columns.tolist()
-joblib.dump((model, feature_order), 'skintypeprediction.pkl')
 
 
 """
