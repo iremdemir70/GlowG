@@ -4,7 +4,7 @@ from database.db import db
 from models.product import Product
 from langchain_helper import get_product_ingredients
 from datetime import datetime, timedelta
-from .ingredient_helpers import save_exist_ingredients, export_ingredients_to_csv
+from .ingredient_helpers import save_exist_ingredients
 
 openai_bp = Blueprint('openai_bp', __name__)
 
@@ -72,11 +72,8 @@ def predict():
         
         save_exist_ingredients(product_id, lines)
 
-        csv_file = export_ingredients_to_csv(lines, product_name)
-
         return jsonify({
-            'ingredients': lines,
-            'csv_file': csv_file
+            'ingredients': lines
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500

@@ -1,9 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Register.css";
 import { useNavigate } from "react-router-dom";
 
+
 const RegisterForm = () => {
   const navigate = useNavigate();
+
+  const [skinTypes, setSkinTypes] = useState([]);
+  const [skinTones, setSkinTones] = useState([]);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:5000/skintypes")
+      .then((res) => res.json())
+      .then((data) => setSkinTypes(data));
+
+    fetch("http://127.0.0.1:5000/skintones")
+      .then((res) => res.json())
+      .then((data) => setSkinTones(data));
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,23 +46,24 @@ const RegisterForm = () => {
       [name]: val,
     }));
   };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     let isValid = true;
     const newErrors = { password: false, confirmPassword: false, mandatory: false };
-
+  
     if (!passwordPattern.test(formData.password)) {
       newErrors.password = true;
       isValid = false;
     }
-
+  
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = true;
       isValid = false;
     }
-
+  
     if (
       !formData.email ||
       !formData.password ||
@@ -60,13 +75,45 @@ const RegisterForm = () => {
       newErrors.mandatory = true;
       isValid = false;
     }
-
+  
     setErrors(newErrors);
-
+  
     if (isValid) {
-      navigate("/RegisterVerification");
+      const payload = {
+        email: formData.email,
+        password: formData.password,
+        skin_type_id: parseInt(formData.skinType),
+        skin_tone_id: parseInt(formData.skinColor),
+        allergens: formData.allergens
+          ? formData.allergens.split(',').map(item => item.trim())
+          : [],
+      };
+      
+  
+      fetch("http://127.0.0.1:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+        .then(res => {
+          if (!res.ok) {
+            return res.json().then(err => { throw new Error(err.message); });
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Register success:", data);
+          navigate("/RegisterVerification");
+        })
+        .catch(err => {
+          console.error("Register failed:", err.message);
+          alert(`Registration failed: ${err.message}`);
+        });
     }
   };
+  
 
   return (
     <div className="container">
@@ -111,32 +158,32 @@ const RegisterForm = () => {
 
           <label>Skin Type*</label>
           <div className="radio-group">
-            {["Dry", "Normal", "Oily", "Combination", "Unknown"].map((type) => (
-              <label key={type} className="radio-option">
+            {skinTypes.map((type) => (
+              <label key={type.id} className="radio-option">
                 <input
                   type="radio"
                   name="skinType"
-                  value={type}
-                  checked={formData.skinType === type}
+                  value={type.id}
+                  checked={parseInt(formData.skinType) === type.id}
                   onChange={handleChange}
                 />
-                {type === "Unknown" ? "I don't know my skin type" : `${type} Skin`}
+                {type.name}
               </label>
             ))}
-          </div>
+          </div>  
 
           <label>Skin Color*</label>
           <div className="radio-group">
-            {["Light", "Medium", "Dark"].map((color) => (
-              <label key={color} className="radio-option">
+            {skinTones.map((tone) => (
+              <label key={tone.id} className="radio-option">
                 <input
                   type="radio"
                   name="skinColor"
-                  value={color}
-                  checked={formData.skinColor === color}
+                  value={tone.id}
+                  checked={parseInt(formData.skinColor) === tone.id}
                   onChange={handleChange}
                 />
-                {`${color} Skin`}
+                {tone.name}
               </label>
             ))}
           </div>

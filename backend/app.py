@@ -3,7 +3,6 @@ from datetime import datetime
 from flask_cors import CORS
 from instance.config import Config
 from database.db import db, bcrypt
-from routes.auth_routes import auth_bp
 from flasgger import Swagger
 from routes.option_routes import options_bp
 from mail_config import mail 
@@ -16,6 +15,7 @@ from models.product import Product
 from routes.skin_type_routes import skin_bp
 from routes.product_routes import product_bp
 from routes.category_routes import category_bp  
+from routes.auth_routes import auth_bp
 
 
 
