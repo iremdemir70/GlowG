@@ -1,57 +1,83 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from datetime import datetime
 from flask_cors import CORS
+from flask_mail import Mail
 from instance.config import Config
 from database.db import db, bcrypt
 from flasgger import Swagger
-from routes.option_routes import options_bp
-from mail_config import mail 
-from flask import  jsonify
-from flask_cors import CORS
-from langchain_helper import get_product_ingredients
-from routes.openai_routes import openai_bp
 from apscheduler.schedulers.background import BackgroundScheduler
-from models.product import Product
+
+# Route dosyaları
+from routes.option_routes import options_bp
+from routes.openai_routes import openai_bp
 from routes.skin_type_routes import skin_bp
 from routes.product_routes import product_bp
-from routes.category_routes import category_bp  
+from routes.category_routes import category_bp
 from routes.auth_routes import auth_bp
 
-
+from models.product import Product
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
-swagger = Swagger(app)
-app.register_blueprint(options_bp)
 app.config.from_object(Config)
+
+# 🔐 Secret Key
+app.config['SECRET_KEY'] = 'glowgenie-süper-gizli-anahtar'
+
+# ✅ CORS ayarı (tek satır yeterli)
+CORS(app, origins=["http://localhost:3000"])
+
+# ✅ Mail ayarları
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'iremdemir440@gmail.com'
+app.config['MAIL_PASSWORD'] = 'fdjluczmrmwpommt'
+
+mail = Mail(app)
+
+# ✅ JWT destekli Swagger yapılandırması
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "GlowGenie API",
+        "description": "JWT korumalı API",
+        "version": "1.0"
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Token giriniz. Örn: Bearer eyJ..."
+        }
+    },
+    "security": [{"Bearer": []}]
+}
+swagger = Swagger(app, template=swagger_template)
+
+# ✅ Init işlemleri
+mail.init_app(app)
+db.init_app(app)
+bcrypt.init_app(app)
+
+# ✅ Blueprint'leri bağla
+app.register_blueprint(options_bp)
 app.register_blueprint(openai_bp)
 app.register_blueprint(skin_bp)
 app.register_blueprint(product_bp)
 app.register_blueprint(category_bp)
-
- # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://glowuser:irem123@localhost:5432/glowgenie'
-
-
-#mail için gönderici adresi. değişebilir.
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'iremdemir440@gmail.com'  
-app.config['MAIL_PASSWORD'] = 'fdjluczmrmwpommt'    
-
-
-mail.init_app(app)
-db.init_app(app)
-bcrypt.init_app(app)
 app.register_blueprint(auth_bp)
+
+# ✅ DB tabloları oluştur
 with app.app_context():
     db.create_all()
-CORS(app)
 
+# ✅ Ana rota
 @app.route('/')
 def hello():
-    return 'Hey!'
+    return 'Hey GlowGenie!'
 
+# ✅ Arka planda çalışan görev: Süresi geçmiş ürünleri sil
 def delete_expired_products():
     now = datetime.now().strftime('%Y-%m-%d')
     expired = Product.query.filter(Product.expiration_date <= now).all()
@@ -63,5 +89,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=delete_expired_products, trigger="interval", hours=24)
 scheduler.start()
 
+# ✅ Çalıştır
 if __name__ == '__main__':
     app.run()

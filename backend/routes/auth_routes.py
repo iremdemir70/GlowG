@@ -5,16 +5,43 @@ from database.db import bcrypt, db
 from flask import current_app
 from flask_mail import Message
 from mail_config import mail
+import jwt
+from datetime import datetime, timedelta
+from functools import wraps
+
 
 auth_bp = Blueprint('auth_bp', __name__)
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            bearer = request.headers['Authorization']
+            token = bearer.split(" ")[1] if " " in bearer else bearer
+
+        if not token:
+            return {'message': 'Token gerekli!'}, 401
+
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = User.query.get(data['user_id'])
+        except jwt.ExpiredSignatureError:
+            return {'message': 'Token süresi dolmuş!'}, 401
+        except jwt.InvalidTokenError:
+            return {'message': 'Token geçersiz!'}, 401
+
+        return f(current_user, *args, **kwargs)
+    return decorated
+
 # get all user
 @auth_bp.route('/users', methods=['GET'])
+@token_required
 @swag_from({
     'tags': ['User'],
     'responses': {
         200: {
-            'description': 'Tüm kullanıcıları veritabanından döndürür',
+            'description': 'Tüm kullanıcıları döndürür',
             'examples': {
                 'application/json': [
                     {'id': 1, 'email': 'user1@mail.com'},
@@ -24,10 +51,9 @@ auth_bp = Blueprint('auth_bp', __name__)
         }
     }
 })
-def get_users():
+def get_users(current_user):
     users = User.query.all()
-    user_list = [user.to_dict() for user in users]
-    return jsonify(user_list)
+    return jsonify([u.to_dict() for u in users])
 
 
 # GET user by ID
@@ -57,7 +83,6 @@ def get_user_by_id(user_id):
     if user:
         return jsonify(user.to_dict()), 200
     return jsonify({"message": "User not found"}), 404
-
 
 # register user
 @auth_bp.route('/register', methods=['POST'])
@@ -99,7 +124,7 @@ def register_user():
     password = data.get('password')
     skin_type_id = data.get('skin_type_id')
     skin_tone_id = data.get('skin_tone_id')
-    allergens = data.get('allergens', [])  # 👈 varsayılan boş liste
+    allergens = data.get('allergens', [])
 
     if not email or not password:
         return {'message': 'Email ve şifre gerekli'}, 400
@@ -111,39 +136,50 @@ def register_user():
         password=hashed_password,
         skin_type_id=skin_type_id,
         skin_tone_id=skin_tone_id,
-        allergens=allergens  # 👈 yeni alan
+        allergens=allergens
     )
     db.session.add(new_user)
     db.session.commit()
 
-    # Doğrulama maili gönder
+    # ✅ Email doğrulama token’ı oluştur
+    verify_token = jwt.encode({
+        'email': email,
+        'exp': datetime.utcnow() + timedelta(hours=6)
+    }, current_app.config['SECRET_KEY'], algorithm="HS256")
+
+    # ✅ Email gönder
+    verify_link = f"http://127.0.0.1:5000/verify?token={verify_token}"
     msg = Message(
         subject="GlowGenie Hesabını Doğrula",
         sender=current_app.config['MAIL_USERNAME'],
         recipients=[email],
-        body=f"Merhaba {email},\n\nLütfen hesabını doğrulamak için şu bağlantıya tıkla:\nhttp://127.0.0.1:5000/verify/{email}"
+        body=f"Merhaba {email},\n\nLütfen hesabını doğrulamak için bu bağlantıya tıkla:\n{verify_link}"
     )
     mail.send(msg)
 
-    return {'message': 'Kayıt başarılı'}, 201
-
+    return {'message': 'Kayıt başarılı, doğrulama maili gönderildi.'}, 201
 
 
 @auth_bp.route('/verify/<path:email>', methods=['GET'])
-def verify_email(email):
-    import urllib.parse
-    decoded_email = urllib.parse.unquote(email)
-    print("GELEN EMAIL:", email)
-    print("DECODE EDİLMİŞ EMAIL:", decoded_email)
-    user = User.query.filter_by(email=decoded_email).first()
-    print("BULUNAN USER:", user)
-    if user:
-        user.is_verified = True
-        db.session.commit()
-        print("SONUÇ -> is_verified:", user.is_verified)
-        return jsonify({"message": f"{decoded_email} başarıyla doğrulandı!", "is_verified": user.is_verified})
-    print("KULLANICI BULUNAMADI!")
-    return jsonify({"error": "Kullanıcı bulunamadı"}), 404
+def verify_email():
+    token = request.args.get('token')
+    if not token:
+        return jsonify({"error": "Token bulunamadı"}), 400
+
+    try:
+        data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        email = data['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.is_verified = True
+            db.session.commit()
+            return jsonify({"message": f"{email} başarıyla doğrulandı!", "is_verified": user.is_verified})
+        return jsonify({"error": "Kullanıcı bulunamadı"}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token süresi dolmuş"}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Token geçersiz"}), 400
+
 
 
 # login user
@@ -177,15 +213,66 @@ def login_user():
     password = data.get('password')
 
     user = User.query.filter_by(email=email).first()
-    if not user:
-        return {'message': 'Geçersiz email veya şifre'}, 401
-
-    if not bcrypt.check_password_hash(user.password, password):
-        return {'message': 'Geçersiz email veya şifre'}, 401
+    if not user or not bcrypt.check_password_hash(user.password, password):
+        return {'message': 'Email veya şifre hatalı'}, 401
 
     if not user.is_verified:
-        return {
-            'message': 'Lütfen mailinize gelen onay bağlantısını tıklayarak hesabınızı doğrulayın.'
-        }, 403
+        return {'message': 'Lütfen hesabınızı doğrulayın.'}, 403
 
-    return {'message': 'Giriş başarılı', 'user_id': user.user_id}, 200
+    token = jwt.encode({
+        'user_id': user.user_id,
+        'exp': datetime.utcnow() + timedelta(hours=24)
+    }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+    return {
+        'message': 'Giriş başarılı',
+        'token': token,
+        'user_id': user.user_id
+    }, 200
+
+#UPDATE PROFILE
+@auth_bp.route('/profile', methods=['PUT'])
+@token_required
+@swag_from({
+    'tags': ['User'],
+    'security': [{"Bearer": []}],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'skin_type_id': {'type': 'integer'},
+                    'skin_tone_id': {'type': 'integer'},
+                    'allergens': {
+                        'type': 'array',
+                        'items': {'type': 'string'}
+                    }
+                }
+            }
+        }
+    ],
+    'responses': {
+        200: {'description': 'Profil başarıyla güncellendi'},
+        400: {'description': 'Geçersiz veri'},
+        401: {'description': 'Token eksik veya geçersiz'}
+    }
+})
+def update_profile(current_user):
+    data = request.get_json()
+
+    if 'skin_type_id' in data:
+        current_user.skin_type_id = data['skin_type_id']
+    if 'skin_tone_id' in data:
+        current_user.skin_tone_id = data['skin_tone_id']
+    if 'allergens' in data:
+        current_user.allergens = data['allergens']
+
+    db.session.commit()
+
+    return {
+        'message': 'Profil başarıyla güncellendi',
+        'updated_profile': current_user.to_dict()
+    }, 200
