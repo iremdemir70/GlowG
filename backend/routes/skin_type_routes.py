@@ -2,10 +2,25 @@ from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 import joblib
 import pandas as pd
+from models.skintone import SkinTone
+from models.skintype import SkinType
 from models.user import User
 from database.db import db
 
 skin_bp = Blueprint('skin_bp', __name__)
+
+
+# GET /skin-types
+@skin_bp.route('/skin-types', methods=['GET'])
+def get_skin_types():
+    types = SkinType.query.all()
+    return jsonify([t.to_dict() for t in types])
+
+# GET /skin-tones
+@skin_bp.route('/skin-tones', methods=['GET'])
+def get_skin_tones():
+    tones = SkinTone.query.all()
+    return jsonify([t.to_dict() for t in tones])
 
 model, EXPECTED_COLUMNS, label_encoder = joblib.load('skintypeprediction.pkl')
 
