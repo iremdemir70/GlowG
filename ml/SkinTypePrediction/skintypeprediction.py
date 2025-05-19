@@ -60,7 +60,9 @@ model = LogisticRegression(
     solver='lbfgs',
     penalty='l2',
     C=1.0,
-    max_iter=1000
+    max_iter=1000,
+    class_weight='balanced'
+
 )
 model.fit(X_train, y_train)
 
