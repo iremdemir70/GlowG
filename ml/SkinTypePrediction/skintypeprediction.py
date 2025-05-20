@@ -1,8 +1,10 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import joblib
+from ctgan import CTGAN
 
 #loading the dataset
 data = pd.read_csv('SkinTypePrediction_Dataset.csv')
@@ -37,37 +39,54 @@ standard_map = {
     'dry (kuru)': 'dry',
     'combination (karma)': 'combination'
 }
-
-
 data['SkinType'] = data['SkinType'].replace(standard_map)
 
+#reordering SkinType to last column
 data = data[data.columns[1:].tolist() + [data.columns[0]]]
 
-#encoding
-X = pd.get_dummies(data.drop(columns='SkinType'))
+#ctgan synth data gen func
+def generate_synthetic_data(df, skin_type, n_samples):
+    subset = df[df["SkinType"] == skin_type]
+    model = CTGAN(epochs=300)
+    model.fit(subset, discrete_columns=subset.columns.tolist())
+    synthetic = model.sample(n_samples)
+    return synthetic
 
-#target encoding
-label_encoder = LabelEncoder()
-y = label_encoder.fit_transform(data['SkinType'])
+#upscaling classes to total of 140 instances
+dry_synth = generate_synthetic_data(data, 'dry', 120)
+normal_synth = generate_synthetic_data(data, 'normal', 117)
+oily_synth = generate_synthetic_data(data, 'oily', 112)
+comb_synth = generate_synthetic_data(data, 'combination', 53)
 
+#real+synth data
+augmented_data = pd.concat([data, dry_synth, normal_synth, oily_synth, comb_synth], ignore_index=True)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+#encoding features and label
+X = pd.get_dummies(augmented_data.drop(columns='SkinType'))
+le = LabelEncoder()
+y = le.fit_transform(augmented_data['SkinType'])
 
-#comb. skin type is dominating the other types, since the other skin types distribute equally
-#I will apply L2 regularization
+#splitting the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
 model = LogisticRegression(
     solver='lbfgs',
     penalty='l2',
     C=1.0,
-    max_iter=1000,
-    class_weight='balanced'
+    max_iter=1000
 
 )
+
 model.fit(X_train, y_train)
 
+y_pred = model.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+
 #saving the model
-joblib.dump((model, X.columns.tolist(), label_encoder), 'skintypeprediction.pkl')
+joblib.dump(model, 'skintypeprediction.pkl')
 #sns.countplot(x='SkinType', data=data)
 #plt.title('Distribution of Skin Types')
 #plt.xlabel('Skin Type')
