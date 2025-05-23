@@ -73,13 +73,7 @@ model = LogisticRegression(
     solver='lbfgs',
     penalty='l2',
     C=1.0,
-<<<<<<< HEAD
     max_iter=1000
-
-=======
-    max_iter=1000,
-    class_weight='balanced'
->>>>>>> 719e1b45f831ee1b7c8553bf2a45574a724a7340
 )
 
 model.fit(X_train, y_train)
@@ -97,8 +91,6 @@ joblib.dump(model, 'skintypeprediction.pkl')
 #plt.xlabel('Skin Type')
 #plt.ylabel('Count')
 #plt.show()
-
-
 
 
 """
@@ -140,7 +132,4 @@ xgb.fit(X_train, y_train)
 # Accuracy
 xgb_train_acc = xgb.score(X_train, y_train)
 xgb_test_acc = xgb.score(X_test, y_test)
-
-print(f"XGBoost Train Accuracy: {xgb_train_acc:.2f}")
-print(f"XGBoost Test Accuracy: {xgb_test_acc:.2f}")
 """
