@@ -28,15 +28,15 @@ function SkinTypeTest() {
   
       const letterMap = ['a', 'b', 'c', 'd'];
       const payload = {
-        user_id: 20, // kullanıcıyı şimdilik elle girdim login hallolunca değişir.
-        Q1: letterMap[answers[0].toLowerCase().charAt(0) === 'a' ? 0 : answers[0].toLowerCase().charAt(0)],
-        Q2: letterMap[answers[1].toLowerCase().charAt(0) === 'a' ? 0 : answers[1].toLowerCase().charAt(0)],
-        Q3: letterMap[answers[2].toLowerCase().charAt(0) === 'a' ? 0 : answers[2].toLowerCase().charAt(0)],
-        Q4: letterMap[answers[3].toLowerCase().charAt(0) === 'a' ? 0 : answers[3].toLowerCase().charAt(0)],
-        Q5: letterMap[answers[4].toLowerCase().charAt(0) === 'a' ? 0 : answers[4].toLowerCase().charAt(0)],
-        Q6: letterMap[answers[5].toLowerCase().charAt(0) === 'a' ? 0 : answers[5].toLowerCase().charAt(0)],
-        Q7: letterMap[answers[6].toLowerCase().charAt(0) === 'a' ? 0 : answers[6].toLowerCase().charAt(0)],
-        Q8: letterMap[answers[7].toLowerCase().charAt(0) === 'a' ? 0 : answers[7].toLowerCase().charAt(0)],
+        user_id: 20,
+        Q1: letterMap[questions[0].options.indexOf(answers[0])],
+        Q2: letterMap[questions[1].options.indexOf(answers[1])],
+        Q3: letterMap[questions[2].options.indexOf(answers[2])],
+        Q4: letterMap[questions[3].options.indexOf(answers[3])],
+        Q5: letterMap[questions[4].options.indexOf(answers[4])],
+        Q6: letterMap[questions[5].options.indexOf(answers[5])],
+        Q7: letterMap[questions[6].options.indexOf(answers[6])],
+        Q8: letterMap[questions[7].options.indexOf(answers[7])],
       };
   
       try {

@@ -2,12 +2,27 @@ from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 import joblib
 import pandas as pd
+from models.skintone import SkinTone
+from models.skintype import SkinType
 from models.user import User
 from database.db import db
 
 skin_bp = Blueprint('skin_bp', __name__)
 
-model, EXPECTED_COLUMNS = joblib.load('skintypeprediction.pkl')
+
+# GET /skin-types
+@skin_bp.route('/skin-types', methods=['GET'])
+def get_skin_types():
+    types = SkinType.query.all()
+    return jsonify([t.to_dict() for t in types])
+
+# GET /skin-tones
+@skin_bp.route('/skin-tones', methods=['GET'])
+def get_skin_tones():
+    tones = SkinTone.query.all()
+    return jsonify([t.to_dict() for t in tones])
+
+model, EXPECTED_COLUMNS, label_encoder = joblib.load('skintypeprediction.pkl')
 
 
 CHOICE_MAP = {
@@ -74,7 +89,7 @@ CHOICE_MAP = {
             'schema': {
                 'type': 'object',
                 'properties': {
-                    'user_id': {'type': 'integer'},  # Bunu ekle
+                    'user_id': {'type': 'integer'},
                     'Q1': {'type': 'string'},
                     'Q2': {'type': 'string'},
                     'Q3': {'type': 'string'},
@@ -92,14 +107,13 @@ CHOICE_MAP = {
         200: {
             'description': 'Tahmin Başarılı',
             'examples': {
-                'application/json': {'prediction': 2}
+                'application/json': {'prediction': 'combination'}
             }
         },
         400: {'description': 'Eksik veri'},
         500: {'description': 'Sunucu hatası'}
     }
 })
-
 def predict_skin_type():
     try:
         data = request.get_json()
@@ -110,28 +124,39 @@ def predict_skin_type():
         if not user_id:
             return jsonify({'error': 'user_id gerekli'}), 400
 
-        # Soruları ayıkla
+        # Soruları ayıkla ve encode et
         question_answers = {k: v for k, v in data.items() if k.startswith('Q')}
         mapped_data = map_user_inputs(question_answers)
         user_df = pd.DataFrame([mapped_data])
         user_df_encoded = pd.get_dummies(user_df)
 
+        # Eksik sütunları sıfırla
         for col in EXPECTED_COLUMNS:
             if col not in user_df_encoded.columns:
                 user_df_encoded[col] = 0
         user_df_encoded = user_df_encoded[EXPECTED_COLUMNS]
 
-        prediction = int(model.predict(user_df_encoded)[0])
+        # Tahmin yap
+        predicted_index = model.predict(user_df_encoded)[0]
+        predicted_label = label_encoder.inverse_transform([predicted_index])[0]
 
         # Kullanıcıyı bul ve güncelle
         user = User.query.get(user_id)
         if not user:
             return jsonify({'error': 'Kullanıcı bulunamadı'}), 404
 
-        user.skin_type_id = prediction
+        user.skin_type_id = int(predicted_index)
         db.session.commit()
 
-        return jsonify({'prediction': prediction, 'updated_user_id': user_id})
+        print("Toplam aktif feature sayısı:", user_df_encoded.sum().sum())
+        print("Aktif olanlar:", user_df_encoded.loc[:, user_df_encoded.any()].columns.tolist())
+        
+        return jsonify({
+            'prediction': predicted_label,
+            'prediction_code': int(predicted_index),
+            'updated_user_id': user_id
+        })
+
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

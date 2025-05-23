@@ -1,138 +1,120 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./RegisterVerification.css";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import './RegisterVerification.css';
 
 const RegisterVerification = () => {
-  const [code, setCode] = useState(["", "", "", ""]);
-  const [attemptCount, setAttemptCount] = useState(0);
-  const [resendCount, setResendCount] = useState(0);
-  const [lastResendTime, setLastResendTime] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [verified, setVerified] = useState(false);
-  const correctCode = "1234";
-  const navigate = useNavigate();
-
-  const inputRefs = useRef([]);
+  const [secondsLeft, setSecondsLeft] = useState(10);
+  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [progressWidth, setProgressWidth] = useState(100);
+  const [isWaitMessageVisible, setIsWaitMessageVisible] = useState(false);
+  const [isProgressVisible, setIsProgressVisible] = useState(false);
+  const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
 
   useEffect(() => {
-    if (verified) {
-      const timeout = setTimeout(() => {
-        navigate("/"); // ya da: window.location.href = 'index.html';
-      }, 7000);
-      return () => clearTimeout(timeout);
-    }
-  }, [verified, navigate]);
+    if (secondsLeft <= 0) return;
 
-  const handleChange = (value, index) => {
-    if (!/^[0-9]?$/.test(value)) return;
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => prev - 1);
+    }, 1000);
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
+    return () => clearInterval(interval);
+  }, [secondsLeft]);
 
-    if (value && index < 3) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && code[index] === "" && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  const handleSubmit = () => {
-    const enteredCode = code.join("");
-
-    if (enteredCode === correctCode) {
-      setErrorMessage("");
-      setVerified(true);
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      setIsResendDisabled(false);
+      setProgressWidth(0);
+      setIsProgressVisible(false);
+      setIsWaitMessageVisible(false);
+      setIsFeedbackVisible(false);
     } else {
-      const newAttempts = attemptCount + 1;
-      setAttemptCount(newAttempts);
-
-      if (newAttempts >= 3) {
-        setErrorMessage("You’ve entered the wrong code 3 times, please request a new one.");
-      } else {
-        setErrorMessage("Confirmation code is not correct.");
-      }
-
-      setCode(["", "", "", ""]);
-      inputRefs.current[0].focus();
+      setProgressWidth((secondsLeft / 10) * 100);
     }
-  };
+  }, [secondsLeft]);
 
-  const resendCode = () => {
-    const now = new Date();
+  const handleResendClick = () => {
+    if (isResendDisabled) return;
 
-    if (resendCount >= 2 && lastResendTime && now - lastResendTime < 10 * 60 * 1000) {
-      setErrorMessage("Please wait 10 mins to request a new code.");
-      return;
-    }
-
-    setResendCount(resendCount + 1);
-    setLastResendTime(now);
-    setAttemptCount(0);
-    setErrorMessage("");
-    setCode(["", "", "", ""]);
-    inputRefs.current[0].focus();
-
-    alert("A new code has been sent to your email.");
+    setIsResendDisabled(true);
+    setIsFeedbackVisible(true);
+    setIsWaitMessageVisible(true);
+    setIsProgressVisible(true);
+    setSecondsLeft(10);
   };
 
   return (
     <div>
-      <h2 className="logo">Glow Genie</h2>
-      <div className="verification-wrapper">
-        <div className="popup-group">
-          {!verified && (
-            <div className="popup" id="first-popup">
-              <p className="popup-description">
-                We have sent you an email so we can verify your account. Could you please check your email address?
-              </p>
-            </div>
-          )}
+      
+      <h2 className="logo text-center mt-4">Glow Genie</h2>
 
-          {verified && (
-            <div className="popup" id="second-popup">
-              <p className="popup-description">
-                Your email address has been verified, you can log in.
-              </p>
-            </div>
-          )}
-        </div>
+      {/* Popup container */}
+      <div className="d-flex justify-content-center">
+        <div className="popup mt-4 text-center">
+          <img
+            src="/images/ChatGPT_Image_8_May_2025_12_46_11.png"
+            alt="Send mail img"
+            className="img-fluid rounded mb-3"
+          />
 
-        <div className="code-card">
-          <h3>We sent a code to your e-mail address please enter the 4-digit code.</h3>
-          {errorMessage && <div style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</div>}
-
-          <div className="code-inputs">
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                type="text"
-                maxLength="1"
-                value={digit}
-                onChange={(e) => handleChange(e.target.value, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                ref={(el) => (inputRefs.current[index] = el)}
-              />
-            ))}
-          </div>
-
-          <div style={{ marginTop: "10px" }}>
+          <h1 className="custom-purple title">You're almost there!</h1>
+          <p className="thanks-text fw-bold">Thanks for registering!</p>
+          <p className="info-text">
+            Please verify your email address to complete your access to GlowGenie.
+          </p>
+          <p className="info-text">
+            We have sent a verification link to your email address{' '}
+            <strong>user@example.com</strong>.
+          </p>
+          <p className="resend-text">
+            Didn't receive an email?{' '}
             <button
               type="button"
-              onClick={resendCode}
-              style={{ background: "none", border: "none", color: "purple", cursor: "pointer" }}
+              className={`custom-purple resend-link ${isResendDisabled ? 'disabled' : ''}`}
+              id="resend-link"
+              onClick={handleResendClick}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                textDecoration: 'underline',
+                cursor: isResendDisabled ? 'not-allowed' : 'pointer',
+                padding: 0,
+                fontSize: 'inherit'
+              }}
             >
-              Re-send the code
+              Resend link
             </button>
-          </div>
-          <br />
-          <button className="verify-btn" onClick={handleSubmit}>
-            Submit
-          </button>
+          </p>
+
+          {isWaitMessageVisible && (
+            <p className="wait-message">
+              A new verification link has been sent to your email.
+            </p>
+          )}
+
+          {isProgressVisible && (
+            <div className="progress" id="progress-bar-container">
+              <div
+                className="progress-bar"
+                role="progressbar"
+                style={{
+                  width: `${progressWidth}%`,
+                  backgroundColor: progressWidth <= 0 ? 'white' : '#f5dbed',
+                  transition: 'width 1s linear',
+                }}
+                aria-valuenow={progressWidth}
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          )}
+
+          {isFeedbackVisible && (
+            <div className="message-container">
+              <p className="resend-message">
+                Please wait to receive a new verification link again. ({secondsLeft} seconds)
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

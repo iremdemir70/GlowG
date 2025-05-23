@@ -1,170 +1,171 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import './UpdatePassword.css';
 
-const PasswordReset = () => {
+const UpdatePassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordMessage, setPasswordMessage] = useState('');
-  const [codeVisible, setCodeVisible] = useState(false);
-  const [codeInputs, setCodeInputs] = useState(['', '', '', '']);
-  const [wrongAttempts, setWrongAttempts] = useState(0);
-  const [resendCooldown, setResendCooldown] = useState(false);
-  const [resendCount, setResendCount] = useState(0);
-  const [codeMessage, setCodeMessage] = useState('');
-  const inputRefs = useRef([]);
+  const [message, setMessage] = useState('');
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [resendFeedback, setResendFeedback] = useState('');
+  const [progress, setProgress] = useState(100);
+  const [showProgress, setShowProgress] = useState(false);
+  const [showWaitMessage, setShowWaitMessage] = useState(false);
 
   const validatePassword = (pwd) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
     return regex.test(pwd);
   };
 
-  const handlePasswordSubmit = () => {
+  const submitPassword = () => {
     if (newPassword !== confirmPassword) {
-      setPasswordMessage("Passwords don’t match.");
-      setCodeVisible(false);
+      setMessage('❌ Passwords don’t match.');
     } else if (!validatePassword(newPassword)) {
-      setPasswordMessage(
-        `Password is weak. Password must contain at least:
-- One uppercase letter
-- One lowercase letter
-- One number
-- One special character
-- Minimum 6 characters`
+      setMessage(
+        `❌ Password is weak.
+        \nPassword must contain at least:\n- One uppercase letter\n- One lowercase letter\n- One number\n- One special character\n- Minimum 6 characters`
       );
-      setCodeVisible(false);
     } else {
-      setPasswordMessage("Your new password is saved.");
-      setCodeVisible(true);
+      setMessage('✅ Your new password is saved.');
+      setShowSuccessPopup(true);
     }
   };
 
-  const handleReset = () => {
+  const resetForm = () => {
     setNewPassword('');
     setConfirmPassword('');
-    setPasswordMessage('');
-    setCodeVisible(false);
-    setCodeInputs(['', '', '', '']);
-    setCodeMessage('');
+    setMessage('');
   };
 
-  const handleCodeChange = (value, index) => {
-    const newInputs = [...codeInputs];
-    newInputs[index] = value;
-    setCodeInputs(newInputs);
+  const handleResend = () => {
+    if (resendDisabled) return;
 
-    if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
+    let secondsLeft = 10;
+    setResendDisabled(true);
+    setResendFeedback(`Please wait to receive a new verification link again. (${secondsLeft} seconds)`);
+    setShowProgress(true);
+    setShowWaitMessage(true);
+    setProgress(100);
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !codeInputs[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
+    const interval = setInterval(() => {
+      secondsLeft -= 1;
+      const newProgress = (secondsLeft / 10) * 100;
+      setProgress(newProgress);
 
-  const handleSubmitCode = () => {
-    const code = codeInputs.join('');
-    const correctCode = '1234';
-
-    if (code !== correctCode) {
-      const attempts = wrongAttempts + 1;
-      setWrongAttempts(attempts);
-
-      if (attempts >= 3) {
-        if (!resendCooldown) {
-          setCodeMessage('You’ve entered the wrong code 3 times, please wait 10 mins to request a new one.');
-          setResendCooldown(true);
-          setTimeout(() => {
-            setResendCooldown(false);
-            setWrongAttempts(0);
-          }, 10 * 60 * 1000);
-        }
+      if (secondsLeft > 0) {
+        setResendFeedback(`Please wait to receive a new verification link again. (${secondsLeft} seconds)`);
       } else {
-        setCodeMessage('Confirmation code is not correct.');
+        clearInterval(interval);
+        setResendDisabled(false);
+        setResendFeedback('');
+        setShowProgress(false);
+        setShowWaitMessage(false);
+        setProgress(100);
       }
-    } else {
-      setCodeMessage('Code confirmed! Redirecting...');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 7000);
-    }
-  };
-
-  const handleResendCode = () => {
-    if (resendCooldown || resendCount >= 2) {
-      setCodeMessage('Please wait 10 mins to request a new code.');
-      return;
-    }
-    setResendCount(resendCount + 1);
-    alert('Verification code has been re-sent.');
-    setCodeMessage('');
+    }, 1000);
   };
 
   return (
-    <div className="container">
-      <h2 className="logo">Glow Genie</h2>
+    <div className="container mt-4">
+      <h2 className="logo text-center my-4">Glow Genie</h2>
 
-      <div className="code-card">
-        <h3>Please enter your new password</h3>
+      <div className="form-container container">
+        <h4 className="mb-4 text-center">Please enter your new password</h4>
 
-        <label htmlFor="new-password">New Password*</label>
-        <input
-          type="password"
-          id="new-password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
+        <div className="mb-3">
+          <label htmlFor="new-password" className="form-label">New Password*</label>
+          <input
+            type="password"
+            id="new-password"
+            className="form-control"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </div>
 
-        <label htmlFor="confirm-password">Confirm Password*</label>
-        <input
-          type="password"
-          id="confirm-password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+        <div className="mb-3">
+          <label htmlFor="confirm-password" className="form-label">Confirm Password*</label>
+          <input
+            type="password"
+            id="confirm-password"
+            className="form-control"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
 
-        <p style={{ whiteSpace: 'pre-line', color: passwordMessage.includes('weak') || passwordMessage.includes("don’t") ? 'red' : 'green' }}>
-          {passwordMessage}
+        <p id="password-message" className="text-center" style={{ whiteSpace: 'pre-wrap', color: message.includes('✅') ? 'green' : 'red' }}>
+          {message}
         </p>
 
-        <button className="verify-btn" onClick={handlePasswordSubmit}>Submit</button>
-        <button className="verify-btn" onClick={handleReset}>Cancel</button>
+        <div className="text-center">
+          <button className="submit-btn me-2" onClick={submitPassword}>Submit</button>
+          <button className="cancel-btn" onClick={resetForm}>Cancel</button>
+        </div>
       </div>
 
-      {codeVisible && (
-        <div className="code-card">
-          <h3>We sent a code to your e-mail address. Please enter the 4-digit code.</h3>
+      {showSuccessPopup && (
+        <div className="container d-flex justify-content-center">
+          <div className="popup mt-4 text-center">
+            <img
+              src="/images/ChatGPT_Image_8_May_2025_12_46_11.png"
+              alt="Send mail img"
+              className="img-fluid rounded mb-3"
+            />
 
-          {codeMessage && <div style={{ color: codeMessage.includes('correct') ? 'red' : 'green' }}>{codeMessage}</div>}
+            <h1 className="custom-purple">You're almost there!</h1>
+            <p className="thanks-text fw-bold">Thanks for confirming your request.</p>
+            <p className="info-text">
+              Please verify your email address to complete the password update process.
+            </p>
+            <p className="info-text">
+              We have sent a verification link to your email address <strong>user@example.com</strong>.
+            </p>
 
-          <div className="code-inputs">
-            {codeInputs.map((val, idx) => (
-              <input
-                key={idx}
-                maxLength={1}
-                value={val}
-                onChange={(e) => handleCodeChange(e.target.value, idx)}
-                onKeyDown={(e) => handleKeyDown(e, idx)}
-                ref={(el) => (inputRefs.current[idx] = el)}
-              />
-            ))}
+           <p className="resend-text">
+            Didn't receive an email?{' '}
+              <button
+                className={`custom-purple resend-link ${resendDisabled ? 'disabled' : ''}`}
+                id="resend-link"
+                onClick={handleResend}
+                style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                Resend link
+              </button>
+
+          </p>
+
+            {showWaitMessage && (
+              <p className="wait-message" style={{ color: 'green' }}>
+                A new verification link has been sent to your email.
+              </p>
+            )}
+
+            {showProgress && (
+              <div className="progress" style={{ display: 'block' }}>
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  style={{ width: `${progress}%`, backgroundColor: '#f5dbed', transition: 'width 1s linear' }}
+                  aria-valuenow={progress}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                />
+              </div>
+            )}
+
+            <div className="message-container">
+              {resendFeedback && (
+                <p id="resend-feedback" className="resend-message">
+                  {resendFeedback}
+                </p>
+              )}
+            </div>
           </div>
-
-          <div style={{ marginTop: '10px' }}>
-            <button
-              style={{ background: 'none', color: 'purple', border: 'none', cursor: 'pointer' }}
-              onClick={handleResendCode}
-            >
-              Re-send the code
-            </button>
-          </div>
-          <br />
-          <button className="verify-btn" onClick={handleSubmitCode}>Submit</button>
         </div>
       )}
     </div>
   );
 };
 
-export default PasswordReset;
+export default UpdatePassword;

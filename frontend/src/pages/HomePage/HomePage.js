@@ -12,6 +12,9 @@ const HomePage = () => {
   const [loginError, setLoginError] = useState('');
   const [userId, setUserId] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [skinTypes, setSkinTypes] = useState([]);
+  const [skinTones, setSkinTones] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
 
 
 
@@ -22,6 +25,11 @@ const HomePage = () => {
   const goToQuiz = () => {
     navigate('/skin-type');
   };
+
+  const goToForgotPassword = () => {
+  navigate('/forgot-password');
+};
+
 
   const login = () => {
     fetch("http://127.0.0.1:5000/login", {
@@ -40,10 +48,10 @@ const HomePage = () => {
         return res.json();
       })
       .then(data => {
-        console.log("Login success:", data);
+        localStorage.setItem("token", data.token); // ✨ Token burada saklanıyor
         setIsLoggedIn(true);
         setLoginError('');
-        setUserId(data.user_id); // 👈 burada geliyor
+        setUserId(data.user_id);
         alert("Login Successful!");
       })
       .catch(err => {
@@ -53,18 +61,72 @@ const HomePage = () => {
   };
   
   
+useEffect(() => {
+  if (userId) {
+    fetch(`http://127.0.0.1:5000/users/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fetched user data:", data);
+        setUserData(data);
+      })
+      .catch(err => console.error("User data fetch failed:", err));
+  }
+}, [userId]);
+
+
   useEffect(() => {
-    if (userId) {
-      fetch(`http://127.0.0.1:5000/users/${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          console.log("Fetched user data:", data);
-          setUserData(data);
-        })
-        .catch(err => console.error("User data fetch failed:", err));
-    }
-  }, [userId]);
-  
+  // Skin types
+  fetch("http://127.0.0.1:5000/skin-types")
+    .then(res => res.json())
+    .then(data => setSkinTypes(data))
+    .catch(err => console.error("Skin types fetch failed", err));
+
+  // Skin tones
+  fetch("http://127.0.0.1:5000/skin-tones")
+    .then(res => res.json())
+    .then(data => setSkinTones(data))
+    .catch(err => console.error("Skin tones fetch failed", err));
+}, []);
+
+
+const updateProfile = () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("Giriş yapılmamış. Lütfen tekrar login olun.");
+    return;
+  }
+
+  fetch("http://127.0.0.1:5000/profile", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      skin_type_id: userData?.skin_type_id,
+      skin_tone_id: userData?.skin_tone_id,
+      allergens: userData?.allergens || []
+    })
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Update failed");
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("✅ Profile updated:", data);
+      alert("✅ Profile updated successfully!");
+      setUserData(data.updated_profile);  // 💥 güncel adları da alalım
+      setIsEditing(false);
+    })
+    .catch(err => {
+      console.error("❌ Profile update failed:", err);
+      alert("❌ Failed to update profile");
+    });
+};
+
 
   const logout = () => {
     setIsLoggedIn(false);
@@ -141,9 +203,22 @@ const HomePage = () => {
 
               {loginError && <p style={{ color: "red" }}>{loginError}</p>}
 
-              <a href="/ForgotPassword" className="forgot-password">
-                Forgot Password?
-              </a>
+            <button
+              type="button"
+              onClick={goToForgotPassword}
+              className="forgot-password"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#007bff',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+                padding: 0,
+                fontSize: 'inherit'
+              }}
+            >
+              Forgot Password?
+            </button>
 
               <br />
               <br />
@@ -167,34 +242,100 @@ const HomePage = () => {
                 readOnly
               />
 
-              <select id="skinType" value={userData?.skin_type_name || ""} disabled>
-                <option value="Oily">Oily</option>
-                <option value="Dry Skin">Dry Skin</option>
-                <option value="Normal">Normal</option>
-                <option value="Combination">Combination</option>
-                <option value="I don't know">I don't know</option>
-              </select>
-
-              <select id="skinTone" value={userData?.skin_tone_name || ""} disabled>
-              <option value="Light Skin">Light Skin</option>
-              <option value="Medium Skin">Medium Skin</option>
-              <option value="Dark Skin">Dark Skin</option>
+              {/* SKIN TYPE */}
+            <select
+              id="skinType"
+              value={
+                isEditing
+                  ? userData?.skin_type_id || ""
+                  : skinTypes.find(t => t.id === userData?.skin_type_id)?.name || userData?.skin_type_name || ""
+              }
+              onChange={
+                isEditing
+                  ? e => setUserData({ ...userData, skin_type_id: parseInt(e.target.value) })
+                  : undefined
+              }
+              disabled={!isEditing}
+            >
+              {!isEditing && <option>{userData?.skin_type_name || "Not set"}</option>}
+              {isEditing &&
+                <>
+                  <option value="">Select skin type</option>
+                  {skinTypes.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  ))}
+                </>
+              }
             </select>
 
-              <input
-                type="text"
-                value={(userData?.allergens || []).join(', ')}
-                placeholder="Allergens: Paraben, Alcohol, etc."
-                readOnly
-              />
+            {/* SKIN TONE */}
+            <select
+              id="skinTone"
+              value={
+                isEditing
+                  ? userData?.skin_tone_id || ""
+                  : skinTones.find(t => t.id === userData?.skin_tone_id)?.name || userData?.skin_tone_name || ""
+              }
+              onChange={
+                isEditing
+                  ? e => setUserData({ ...userData, skin_tone_id: parseInt(e.target.value) })
+                  : undefined
+              }
+              disabled={!isEditing}
+            >
+              {!isEditing && <option>{userData?.skin_tone_name || "Not set"}</option>}
+              {isEditing &&
+                <>
+                  <option value="">Select skin tone</option>
+                  {skinTones.map(tone => (
+                    <option key={tone.id} value={tone.id}>
+                      {tone.name}
+                    </option>
+                  ))}
+                </>
+              }
+            </select>
 
-              <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
-                <a href="/UpdatePassword" id="changePasswordLink">
+            {/* ALLERGENS */}
+            <input
+              type="text"
+              value={(userData?.allergens || []).join(', ')}
+              onChange={isEditing ? e =>
+                setUserData({
+                  ...userData,
+                  allergens: e.target.value.split(',').map(item => item.trim())
+                }) : undefined}
+              placeholder="Allergens: Paraben, Alcohol, etc."
+              readOnly={!isEditing}
+            />
+
+
+            <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '16px' }}>
+                <button
+                  onClick={() => navigate('/update-password')}
+                  id="changePasswordLink"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#007bff',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '16px'
+                  }}
+                >
                   Change Password
-                </a>
+                </button>
               </div>
-
-              <button>Update</button>
+                {!isEditing ? (
+                  <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+                ) : (
+                  <>
+                    <button onClick={updateProfile}>Update Profile</button>
+                    <button onClick={() => setIsEditing(false)}>Cancel</button>
+                  </>
+                )}
               <button onClick={logout}>Log Out</button>
             </div>
 
