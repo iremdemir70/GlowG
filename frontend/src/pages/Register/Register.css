@@ -1,48 +1,30 @@
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #f3e7e9, #e3eeff);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.logo {
-  font-family: 'Brush Script MT', cursive; /* Lucida Handwriting de olabilir belki */
-  font-size: 28px;
-  margin-top: 0;
-  color: #6b2e87;
-}
-
 /* Form Konteyneri */
-.register-form {
-  background-color: rgba(255, 255, 255, 0.3);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
-  text-align: left;
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
 }
 
-/* Başlık Stili */
-h1, h2 {
-  text-align: center;
-  color: #5a0080;
+.register-form-wrapper {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: left;
 }
 
-/* Form Etiketleri */
-label {
-  font-weight: bold;
-  color: #5a0080;
-  display: block;
-  margin-top: 10px;
+/* Form Stili */
+.register-form-label {
+    font-weight: bold;
+    color: #5a0080;
+    display: block;
+    margin-top: 10px;
 }
 
-/* Giriş Alanları */
-input[type="email"],
-input[type="password"],
-input[type="text"] {
+.form-input {
   width: 100%;
   padding: 0.6rem;
   margin-bottom: 1rem;
@@ -51,67 +33,90 @@ input[type="text"] {
   box-sizing: border-box;
 }
 
-/* Hata Mesajları */
-.error-text {
-  font-size: 12px;
-  color: red;
-  margin-top: 3px;
-  display: none;
-}
+/* Hata MesajlarÄ± */
 
-/* Radyo Butonları */
+.error {
+  font-size: 12px;
+    color: red;
+    margin-top: 3px;
+    
+}
+/* Radyo ButonlarÄ± */
 .radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .radio-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Checkbox */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-input {
+    margin-right: 10px;
 }
 
 /* Butonlar */
 .button-group {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
-.form-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background-color: #c797eb;
-  color: white;
-  transition: background-color 0.3s ease;
+.submit-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-.form-btn:hover {
-  background-color: #a05fcf;
+.submit-btn {
+    background-color: #c797eb;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #ff7f7f;
+    color: white;
+}
+
+.submit-btn:hover {
+    background-color: #a05fcf;
+}
+
+.cancel-btn:hover {
+    background-color: #ff4d4d;
 }
 
 @media (max-width: 480px) {
-  form {
+    .register-form-wrapper {
       padding: 1.2rem;
       max-width: 90vw;
-  }
+    }
 
-  .radio-option {
+    .radio-option {
       font-size: 0.9rem;
-  }
+    }
 
-  .button-group {
+    .button-group {
       display: flex;
       flex-direction: column;
       gap: 0.8rem;
-  }
+    }
 
-  .button-group button {
+    .button-group button {
       width: 100%;
-  }
+    }
 }

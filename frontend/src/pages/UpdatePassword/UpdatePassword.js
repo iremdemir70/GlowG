@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './UpdatePassword.css';
 
 const UpdatePassword = () => {
@@ -8,25 +8,35 @@ const UpdatePassword = () => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendFeedback, setResendFeedback] = useState('');
-  const [progress, setProgress] = useState(100);
+  const [secondsLeft, setSecondsLeft] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [showWaitMessage, setShowWaitMessage] = useState(false);
+  const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
 
   const validatePassword = (pwd) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+    const regex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[\W_]).{6,}$/;
     return regex.test(pwd);
   };
 
   const submitPassword = () => {
     if (newPassword !== confirmPassword) {
-      setMessage('❌ Passwords don’t match.');
+      setMessage("❌ Passwords don’t match.");
     } else if (!validatePassword(newPassword)) {
-      setMessage(
-        `❌ Password is weak.
-        \nPassword must contain at least:\n- One uppercase letter\n- One lowercase letter\n- One number\n- One special character\n- Minimum 6 characters`
-      );
+      setMessage(`
+        ❌ Password is weak.<br/>
+        <small style="font-size: 0.9rem; color: #555;">
+          Password must contain at least:
+          <ul class="mt-2" style="text-align: left; padding-left: 1rem;">
+            <li>One uppercase letter</li>
+            <li>One lowercase letter</li>
+            <li>One number</li>
+            <li>One special character</li>
+            <li>Minimum 6 characters</li>
+          </ul>
+        </small>
+      `);
     } else {
-      setMessage('✅ Your new password is saved.');
+      setMessage("✅ Your new password is saved.");
       setShowSuccessPopup(true);
     }
   };
@@ -40,30 +50,34 @@ const UpdatePassword = () => {
   const handleResend = () => {
     if (resendDisabled) return;
 
-    let secondsLeft = 10;
     setResendDisabled(true);
-    setResendFeedback(`Please wait to receive a new verification link again. (${secondsLeft} seconds)`);
     setShowProgress(true);
     setShowWaitMessage(true);
-    setProgress(100);
+    setSecondsLeft(10);
+    setResendFeedback('Please wait to receive a new verification link again. (10 seconds)');
+    setIsFeedbackVisible(true);
 
-    const interval = setInterval(() => {
-      secondsLeft -= 1;
-      const newProgress = (secondsLeft / 10) * 100;
-      setProgress(newProgress);
-
-      if (secondsLeft > 0) {
-        setResendFeedback(`Please wait to receive a new verification link again. (${secondsLeft} seconds)`);
-      } else {
-        clearInterval(interval);
-        setResendDisabled(false);
-        setResendFeedback('');
-        setShowProgress(false);
-        setShowWaitMessage(false);
-        setProgress(100);
-      }
-    }, 1000);
+    // Buraya resend API çağrısı eklenebilir.
   };
+
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      setResendDisabled(false);
+      setShowProgress(false);
+      setShowWaitMessage(false);
+      setResendFeedback('');
+      setIsFeedbackVisible(false);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [secondsLeft]);
+
+  const progressWidth = (secondsLeft / 10) * 100;
 
   return (
     <div className="container mt-4">
@@ -94,9 +108,12 @@ const UpdatePassword = () => {
           />
         </div>
 
-        <p id="password-message" className="text-center" style={{ whiteSpace: 'pre-wrap', color: message.includes('✅') ? 'green' : 'red' }}>
-          {message}
-        </p>
+        <div
+          id="password-message"
+          className="text-center"
+          style={{ whiteSpace: 'pre-wrap' }}
+          dangerouslySetInnerHTML={{ __html: message }}
+        />
 
         <div className="text-center">
           <button className="submit-btn me-2" onClick={submitPassword}>Submit</button>
@@ -112,7 +129,6 @@ const UpdatePassword = () => {
               alt="Send mail img"
               className="img-fluid rounded mb-3"
             />
-
             <h1 className="custom-purple">You're almost there!</h1>
             <p className="thanks-text fw-bold">Thanks for confirming your request.</p>
             <p className="info-text">
@@ -122,18 +138,20 @@ const UpdatePassword = () => {
               We have sent a verification link to your email address <strong>user@example.com</strong>.
             </p>
 
-           <p className="resend-text">
-            Didn't receive an email?{' '}
-              <button
-                className={`custom-purple resend-link ${resendDisabled ? 'disabled' : ''}`}
-                id="resend-link"
-                onClick={handleResend}
-                style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}
-              >
-                Resend link
-              </button>
+            <p className="resend-text">
+              Didn't receive an email?{' '}
+            <button
+              type="button"
+              className={`custom-purple resend-link ${resendDisabled ? 'disabled' : ''}`}
+              id="resend-link"
+              onClick={handleResend}
+              disabled={resendDisabled}
+              style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
+            >
+              Resend link
+            </button>
+            </p>
 
-          </p>
 
             {showWaitMessage && (
               <p className="wait-message" style={{ color: 'green' }}>
@@ -142,25 +160,33 @@ const UpdatePassword = () => {
             )}
 
             {showProgress && (
-              <div className="progress" style={{ display: 'block' }}>
+              <div className="progress">
                 <div
                   className="progress-bar"
                   role="progressbar"
-                  style={{ width: `${progress}%`, backgroundColor: '#f5dbed', transition: 'width 1s linear' }}
-                  aria-valuenow={progress}
+                  style={{
+                    width: `${progressWidth}%`,
+                    backgroundColor: '#f5dbed',
+                    transition: 'width 1s linear'
+                  }}
+                  aria-valuenow={progressWidth}
                   aria-valuemin="0"
                   aria-valuemax="100"
                 />
               </div>
             )}
 
-            <div className="message-container">
-              {resendFeedback && (
-                <p id="resend-feedback" className="resend-message">
-                  {resendFeedback}
+            {resendFeedback && (
+              <div className="message-container">
+                <p
+                  id="resend-feedback"
+                  className="resend-message"
+                  style={{ display: isFeedbackVisible ? 'block' : 'none' }}
+                >
+                  Please wait to receive a new verification link again. ({secondsLeft} seconds)
                 </p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}

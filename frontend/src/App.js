@@ -7,7 +7,7 @@ import SkinTypeTest from './pages/SkinTypeTest/SkinTypeTest';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword/UpdatePassword';
 import RegisterVerification from './pages/RegisterVerification/RegisterVerification';
-import HomePage from './pages/HomePage/HomePage'; // Bu şekilde güncelleyin
+import HomePage from './pages/HomePage/HomePage'; 
 
 
 

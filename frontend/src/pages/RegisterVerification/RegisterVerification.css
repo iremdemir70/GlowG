@@ -1,4 +1,9 @@
-
+/* General style settings */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 .custom-purple {
   color: #4b0082;
@@ -21,133 +26,123 @@ body {
   margin-top: 50px;
 }
 
-/* Popup  */
+/* Popup kapsayÄ±cÄ±sÄ± */
 .popup {
-  font-size: 14px;
-  background-color: #fff;
-  border: 10px solid #f5dbed;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  text-align: left;
-  max-width: 400px;
-  margin: 30px auto;
-  position: relative;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-  
+    font-size: 14px;
+    background-color: #fff;
+    border: 10px solid #f5dbed;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    max-width: 400px;
+    margin: 50px auto;
 }
 
-/* Picture style setting */
+/* Popup iÃ§indeki resim */
 .popup img {
-  width: 100%;
-  border-radius: 12px;
-  margin-bottom: 15px;
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 15px;
 }
 
-/* Text contents */
-.popup h1.title {
-  font-size: 22px;
-  color: #4b0082;
-  margin-bottom: 10px;
+/* Popup iÃ§indeki baÅŸlÄ±k */
+.popup h1 {
+    font-size: 1.5rem;
+    color: #4b0082;
+    margin-bottom: 10px;
 }
 
+/* TeÅŸekkÃ¼r metni */
 .popup .thanks-text {
-  font-weight: bold;
-  margin-bottom: 10px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
+/* AÃ§Ä±klama metni */
 .popup .info-text {
-  margin-bottom: 8px;
-  font-size: 15px; 
+    margin-bottom: 8px;
 }
 
-.popup .resend-text {
-  margin-top: 20px;
-  font-size: 16px; 
-  text-align: center;
+/* Tekrar gÃ¶nderme baÄŸlantÄ± alanÄ± */
+.popup .resend {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    text-align: center;
 }
 
-.popup .resend-link {
-  color: #4b0082;
-  text-decoration: none;
-  padding-left: 5px;
-  padding-right: 5px;
+.popup .resend a {
+    color: #4b0082;
+    text-decoration: none;
 }
 
-.popup .resend-link:hover {
-  text-decoration: underline;
+.popup .resend a:hover {
+    text-decoration: underline;
 }
 
-.popup .resend-link.disabled {
-  pointer-events: none;
-  color: gray;
-  cursor: not-allowed;
-  text-decoration: none;
-}
-
-.resend-text {
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 10px;
+/* Genel resend alanÄ± */
+.resend {
+    text-align: center;
+    margin-top: 20px;
 }
 
 #resend-feedback {
-  text-align: center;
-  display: none;
+    text-align: center;
+    display: none;
 }
 
-.resend-message {
-  font-size: 15px;
-  font-weight: normal;
-  color: #4b0082;
+#resend-link.disabled {
+    pointer-events: none; 
+    color: gray !important; 
+    cursor: not-allowed; 
+    text-decoration: none; 
 }
 
-.wait-message {
-  font-size: 15px;
-  color: #28a745;
-}
-
-/* Countdown bar */
+/* Geri sayÄ±m barÄ± */
 .progress {
-  height: 20px;
-  background-color: white;
-  border-radius: 10px;
+    height: 20px;
+    background-color: white;
+    display: none;
+    border-radius: 10px;
 }
 
 .progress-bar {
-  width: 0%;
-  height: 100%;
-  background-color: #f5dbed;
-  transition: width 1s linear;
-  border-radius: 10px;
+    width: 0%;
+    height: 100%;
+    background-color: #f5dbed;
+    transition: width 1s linear;
+    border-radius: 10px;
 }
 
 .progress-bar.empty {
-  background-color: #f5dbed;
+    background-color: #f5dbed;
 }
 
+/* Popup iÃ§i mesajlar */
 .message-container {
-  margin-top: 10px;
-  font-size: 14px;
+    margin-top: 10px;
+    font-size: 14px;
 }
 
-/* Mobile */
+.resend-message {
+    font-size: 15px;
+    font-weight: normal;
+    color: #4b0082;
+}
+
+.wait-message {
+    font-size: 15px;
+    color: #777;
+}
+
+/* Mobil uyumluluk */
 @media (max-width: 768px) {
-  .popup {
-    margin: 30px 15px;
-  }
+    .popup {
+        margin: 30px 15px;
+        font-size: 13px;
+    }
 
-  .logo {
-    font-size: 3rem;
-    margin-top: 50px;
-  }
-
-  .popup h1 {
-    font-size: 1.3rem;
-  }
-
-  .popup {
-    font-size: 13px;
-  }
+    .popup h1 {
+        font-size: 1.3rem;
+    }
 }
