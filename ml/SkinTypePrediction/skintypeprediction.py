@@ -53,7 +53,7 @@ def generate_synthetic_data(df, skin_type, n_samples):
     return synthetic
 
 #upscaling classes to total of 140 instances
-dry_synth = generate_synthetic_data(data, 'dry', 120)
+dry_synth = generate_synthetic_data(data, 'dry', 130)
 normal_synth = generate_synthetic_data(data, 'normal', 117)
 oily_synth = generate_synthetic_data(data, 'oily', 112)
 comb_synth = generate_synthetic_data(data, 'combination', 53)
