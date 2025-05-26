@@ -95,10 +95,22 @@ categories.forEach(cat => {
       <div className="filter-section">
   <dl className={`dropdown ${dropdownOpen ? 'open' : ''}`}>
     <dt>
-      <a href="#" onClick={toggleDropdown}>
-        <span className="hida">Select Product Category</span>
-        <p className="multiSel">{selectedCategories.join(', ')}</p>
-      </a>
+      <button
+    type="button"
+    onClick={toggleDropdown}
+    className="dropdown-toggle"
+    style={{
+      background: 'none',
+      border: 'none',
+      padding: 0,
+      color: 'inherit',
+      cursor: 'pointer',
+      textAlign: 'left'
+    }}
+  >
+    <span className="hida">Select Product Category</span>
+    <p className="multiSel">{selectedCategories.join(', ')}</p>
+  </button>
     </dt>
     <dd>
       <div className="mutliSelect">
