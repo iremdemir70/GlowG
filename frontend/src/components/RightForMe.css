@@ -1,0 +1,113 @@
+.interface-container {
+  text-align: center;
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.logo {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 2rem;
+    text-align: center;
+    color: #4b0082;
+    margin-top: 30px;
+}
+
+.skin-type {
+  color: purple;
+  font-weight: bold;
+}
+
+.input-form {
+  margin: 1rem 0;
+}
+
+.input-form input {
+  padding: 0.5rem;
+  width: 300px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.input-form button {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.instruction {
+  color: red;
+  font-size: 0.9rem;
+}
+
+.product-lists {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+}
+
+.product-section {
+  width: 45%;
+}
+
+.product-card {
+  border-radius: 15px;
+  margin: 1rem 0;
+  padding: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px;
+}
+
+.product-card.suitable {
+  border: 2px solid green;
+  box-shadow: 3px 3px 0px green;
+}
+
+.product-card.unsuitable {
+  border: 2px solid red;
+  box-shadow: 3px 3px 0px red;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 500px;
+  position: relative;
+}
+
+.modal.suitable .modal-content {
+  border: 5px solid green;
+}
+
+.modal.unsuitable .modal-content {
+  border: 5px solid red;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  color: darkred;
+  cursor: pointer;
+}
+
+.badge-transparent {
+  background-color: transparent !important;
+  color: #4b0082;
+  font-size: 25px;
+}
