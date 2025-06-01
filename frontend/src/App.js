@@ -40,16 +40,18 @@ function MainLayout() {
   return (
     <>
       {!shouldHideNavbar && <Navbar />}
-      <Routes>
-        <Route path="/home-page" element={<HomePage />} /> 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/register-verification" element={<RegisterVerification />} />
-        <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="/skin-type-test" element={<SkinTypeTest />} /> 
-        <Route path="/register" element={<Register />} /> 
-        <Route path="/product-page" element={<ProductPage />} /> 
-        <Route path="/product-right-for-me" element={<RightForMe />} />
-      </Routes>
+    <Routes>
+      <Route path="/" element={<HomePage />} /> {/* Ana sayfa */}
+      <Route path="/home-page" element={<HomePage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/register-verification" element={<RegisterVerification />} />
+      <Route path="/update-password" element={<UpdatePassword />} />
+      <Route path="/skin-type-test" element={<SkinTypeTest />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/product-page" element={<ProductPage />} />
+      <Route path="/product-right-for-me" element={<RightForMe />} />
+    </Routes>
+
     </>
   );
 }
