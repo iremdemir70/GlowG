@@ -5,6 +5,8 @@ from models.product import Product
 from langchain_helper import get_product_ingredients
 from datetime import datetime, timedelta
 from .ingredient_helpers import save_exist_ingredients
+from ml.ml_predictor import predict_suitability
+from models.user import User
 
 openai_bp = Blueprint('openai_bp', __name__)
 
@@ -32,7 +34,11 @@ openai_bp = Blueprint('openai_bp', __name__)
             'examples': {
                 'application/json': {
                     'ingredients': ['Aqua', 'Glycerin', 'Ceramide NP'],
-                    'csv_file': 'cerave_cleanser_ingredients.csv'
+                    'suitability': {
+                        'skin_type': 'KURU',
+                        'probability': 0.782,
+                        'label': 'Suitable'
+                    }
                 }
             }
         },
@@ -72,8 +78,21 @@ def predict():
         
         save_exist_ingredients(product_id, lines)
 
+        # ML ENTEGRASYONU BAŞLANGIÇ 🔽
+        user = User.query.filter_by(user_id=1).first()  # kendi sistemine göre user_id'yi değiştir
+        if not user or not user.skin_type:
+            return jsonify({'error': 'Kullanıcının cilt tipi bulunamadı'}), 400
+
+        prob, label = predict_suitability(product_id, user.skin_type.upper())
+        # ML ENTEGRASYONU BİTİŞ 🔼
+
         return jsonify({
-            'ingredients': lines
+            'ingredients': lines,
+            'suitability': {
+                'skin_type': user.skin_type,
+                'probability': prob,
+                'label': label
+            }
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
