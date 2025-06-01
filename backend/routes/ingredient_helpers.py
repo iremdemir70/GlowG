@@ -2,17 +2,18 @@ from models.ingredients import Ingredient
 from models.exist_ingredients import ExistIngredient
 from database.db import db
 
+def normalize_ingredient(name):
+    return name.lower().strip().replace("-", " ").replace("/", " ")
+
 def save_exist_ingredients(product_id, product_ingredients):
-    """
-    product_id: int, aratılan ürünün id'si
-    product_ingredients: list, prompt'tan gelen temiz ingredient isim listesi
-    """
+    normalized_input = [normalize_ingredient(i) for i in product_ingredients]
     critical_ingredients = Ingredient.query.all()
 
     for crit in critical_ingredients:
-        is_exist = int(any(
-            crit.ingredient_name.lower() == i.lower() for i in product_ingredients
-        ))
+        crit_name_norm = normalize_ingredient(crit.ingredient_name)
+
+        is_exist = int(crit_name_norm in normalized_input)
+
         exist = ExistIngredient.query.filter_by(product_id=product_id, ingredient_id=crit.ingredient_id).first()
         if not exist:
             exist = ExistIngredient(
@@ -23,7 +24,9 @@ def save_exist_ingredients(product_id, product_ingredients):
             db.session.add(exist)
         else:
             exist.is_exist = is_exist  
+
     db.session.commit()
+
 # def export_ingredients_to_csv(ingredients_list, product_name):
 #     import os
 #     import pandas as pd

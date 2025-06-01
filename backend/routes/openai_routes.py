@@ -1,3 +1,4 @@
+from models.skintype import SkinType 
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 from database.db import db
@@ -7,10 +8,12 @@ from datetime import datetime, timedelta
 from .ingredient_helpers import save_exist_ingredients
 from ml.ml_predictor import predict_suitability
 from models.user import User
+from routes.auth_routes import token_required
 
 openai_bp = Blueprint('openai_bp', __name__)
 
 @openai_bp.route('/predict', methods=['POST'])
+@token_required
 @swag_from({
     'tags': ['AI Ingredients'],
     'parameters': [
@@ -46,7 +49,7 @@ openai_bp = Blueprint('openai_bp', __name__)
         500: {'description': 'Sunucu hatası'}
     }
 })
-def predict():
+def predict(current_user): 
     data = request.get_json()
     product_name = data.get("product_name")
     category_id = data.get("category_id")
@@ -78,18 +81,33 @@ def predict():
         
         save_exist_ingredients(product_id, lines)
 
-        # ML ENTEGRASYONU BAŞLANGIÇ 🔽
-        user = User.query.filter_by(user_id=1).first()  # kendi sistemine göre user_id'yi değiştir
-        if not user or not user.skin_type:
-            return jsonify({'error': 'Kullanıcının cilt tipi bulunamadı'}), 400
+        user = current_user
 
-        prob, label = predict_suitability(product_id, user.skin_type.upper())
-        # ML ENTEGRASYONU BİTİŞ 🔼
+        skin_type = SkinType.query.get(user.skin_type_id)
+        if not skin_type or not skin_type.type_name:
+            return jsonify({'error': 'Kullanıcının cilt tipi tanımlı değil'}), 400
+
+        english_to_turkish = {
+            "OILY": "YAGLI",
+            "OILY SKIN": "YAGLI",
+            "DRY": "KURU",
+            "DRY SKIN": "KURU",
+            "COMBINATION": "KARMA",
+            "COMBINATION SKIN": "KARMA",
+            "NORMAL": "NORMAL",
+            "NORMAL SKIN": "NORMAL"
+        }
+
+        mapped = english_to_turkish.get(skin_type.type_name.upper().strip())
+        if not mapped:
+            return jsonify({'error': f"No model for skin type: {skin_type.type_name}"}), 400
+
+        prob, label = predict_suitability(product_id, mapped)
 
         return jsonify({
             'ingredients': lines,
             'suitability': {
-                'skin_type': user.skin_type,
+                'skin_type': skin_type.type_name,
                 'probability': prob,
                 'label': label
             }
