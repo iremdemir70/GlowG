@@ -170,9 +170,11 @@ const HomePage = () => {
 ) : (
   <div className="card-container">
     <h2>Profile</h2>
-    <input type="email" value={userData?.email || ""} readOnly />
+
+    <input type="email" id="profileEmail" value={userData?.email || ''} readOnly />
+
     <select
-      value={isEditing ? userData?.skin_type_id || "" : skinTypes.find(t => t.id === userData?.skin_type_id)?.name || userData?.skin_type_name || ""}
+      value={isEditing ? userData?.skin_type_id || '' : skinTypes.find(t => t.id === userData?.skin_type_id)?.name || userData?.skin_type_name || ''}
       onChange={isEditing ? e => setUserData({ ...userData, skin_type_id: parseInt(e.target.value) }) : undefined}
       disabled={!isEditing}
     >
@@ -186,7 +188,7 @@ const HomePage = () => {
     </select>
 
     <select
-      value={isEditing ? userData?.skin_tone_id || "" : skinTones.find(t => t.id === userData?.skin_tone_id)?.name || userData?.skin_tone_name || ""}
+      value={isEditing ? userData?.skin_tone_id || '' : skinTones.find(t => t.id === userData?.skin_tone_id)?.name || userData?.skin_tone_name || ''}
       onChange={isEditing ? e => setUserData({ ...userData, skin_tone_id: parseInt(e.target.value) }) : undefined}
       disabled={!isEditing}
     >
@@ -201,31 +203,32 @@ const HomePage = () => {
 
     <input
       type="text"
+      placeholder="Allergens: Paraben, Alcohol, etc."
       value={(userData?.allergens || []).join(', ')}
       onChange={isEditing ? e =>
         setUserData({
           ...userData,
           allergens: e.target.value.split(',').map(item => item.trim())
         }) : undefined}
-      placeholder="Allergens: Paraben, Alcohol, etc."
       readOnly={!isEditing}
     />
 
-    <button onClick={goToUpdatePassword} style={{ background: 'none', border: 'none', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
-      Change Password
-    </button>
+    <div style={{ textAlign: 'center', marginTop: 10, fontSize: 16 }}>
+      <a href="/update-password" id="changePasswordLink">Change Password</a>
+    </div>
 
     {!isEditing ? (
       <button onClick={() => setIsEditing(true)}>Edit Profile</button>
     ) : (
       <>
-        <button onClick={updateProfile}>Update Profile</button>
+        <button onClick={updateProfile}>Update</button>
         <button onClick={() => setIsEditing(false)}>Cancel</button>
       </>
     )}
     <button onClick={logout}>Log Out</button>
   </div>
 )}
+
 
       </main>
     </div>

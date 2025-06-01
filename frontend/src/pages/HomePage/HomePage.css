@@ -126,56 +126,73 @@ main {
     color: white;
 }
 
-/* Ortak kart stili */
 .card-container {
   background-color: rgba(255, 255, 255, 0.3);
-  padding: 3rem;
-  border-radius: 2rem;
-  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
-  margin-top: 5rem;
-  width: 100%;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Input ve Select Ortak Stili */
+.card-container h2 {
+  color: #5a0080;
+  margin-bottom: 20px;
+}
+
 .card-container input,
 .card-container select {
   width: 100%;
-  padding: 1rem;
-  margin: 1rem 0;
+  padding: 10px;
+  margin: 10px 0;
   border: 1px solid #c797eb;
-  border-radius: 1rem;
-  font-size: 1.4rem;
-}
-
-.card-container h2 {
-  color: #5a0080;
-  margin-bottom: 2rem;
+  border-radius: 10px;
+  font-size: 14px;
 }
 
 .card-container button {
+  width: 100%;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
   background-color: #c797eb;
   color: white;
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 1rem;
   cursor: pointer;
-  margin-top: 1rem;
-  width: 100%;
   transition: background-color 0.3s ease;
-  font-size: 1.4rem;
 }
 
 .card-container button:hover {
   background-color: #a05fcf;
 }
 
+#changePasswordLink {
+  color: #5a0080;
+  text-decoration: none;
+}
 
+#changePasswordLink:hover {
+  color: #a05fcf;
+  text-decoration: underline;
+}
+
+.update-message {
+  font-weight: bold;
+  font-size: 14px;
+  color: green;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .card-container {
+    width: 90%;
+    margin-top: 20px;
+  }
+}
 
 /* Pop-up */
 .popup {
