@@ -126,49 +126,56 @@ main {
     color: white;
 }
 
-/* Profile Card */
-#profileCard {
-    background-color: rgba(255, 255, 255, 0.3);
-    padding: 3rem;
-    border-radius: 2rem;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
-    margin-top: 5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Ortak kart stili */
+.card-container {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 3rem;
+  border-radius: 2rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+  margin-top: 5rem;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#profileCard h2 {
-    color: #5a0080;
-    margin-bottom: 2rem;
+/* Input ve Select Ortak Stili */
+.card-container input,
+.card-container select {
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #c797eb;
+  border-radius: 1rem;
+  font-size: 1.4rem;
 }
 
-#profileCard input,
-#profileCard select {
-    width: 100%;
-    padding: 1rem;
-    margin: 1rem 0;
-    border: 1px solid #c797eb;
-    border-radius: 1rem;
-    font-size: 1.4rem;
+.card-container h2 {
+  color: #5a0080;
+  margin-bottom: 2rem;
 }
 
-#profileCard button {
-    background-color: #c797eb;
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-    width: 100%;
-    transition: background-color 0.3s ease;
-    font-size: 1.4rem;
+.card-container button {
+  background-color: #c797eb;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  width: 100%;
+  transition: background-color 0.3s ease;
+  font-size: 1.4rem;
 }
 
-#profileCard button:hover {
-    background-color: #a05fcf;
+.card-container button:hover {
+  background-color: #a05fcf;
 }
+
+
 
 /* Pop-up */
 .popup {

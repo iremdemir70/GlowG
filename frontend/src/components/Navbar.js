@@ -13,7 +13,7 @@ const Navbar = () => {
         <span></span>
       </label>
       <ul className="navbar-links">
-        <li><Link to="/products">Show All Skin Care Products</Link></li>
+        <li><Link to="/product-page">Show All Skin Care Products</Link></li>
         <li><Link to="#">About</Link></li>
         <li><Link to="#">Contact</Link></li>
         <li><Link to="/">Home</Link></li>
