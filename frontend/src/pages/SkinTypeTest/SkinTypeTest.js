@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SkinTypeTest.css";
+import SkinTypePopup from '../../components/SkinTypePopup';
 import { useNavigate } from "react-router-dom";
 
 const typeIdToName = {
@@ -15,6 +16,7 @@ function SkinTypeTest() {
   const [answers, setAnswers] = useState(Array(8).fill(""));
   const [error, setError] = useState(false);
   const [result, setResult] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const letterMap = ["a", "b", "c", "d"];
 
@@ -93,26 +95,27 @@ function SkinTypeTest() {
         Q5: letterMap[questions[4].options.indexOf(answers[4])],
         Q6: letterMap[questions[5].options.indexOf(answers[5])],
         Q7: letterMap[questions[6].options.indexOf(answers[6])],
-        Q8: letterMap[questions[7].options.indexOf(answers[7])],
+        Q8: letterMap[questions[7].options.indexOf(answers[7])]
       };
 
       try {
         const response = await fetch("http://127.0.0.1:5000/predict-skintype", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
 
         const data = await response.json();
         if (response.ok) {
-          setResult(typeIdToName[data.prediction_code] || data.prediction);
+          const resultName = typeIdToName[data.prediction_code] || data.prediction;
+          setResult(resultName);
+          setIsPopupOpen(true);
         } else {
           setResult("Prediction failed: " + data.error);
         }
       } catch (err) {
         setResult("Error: " + err.message);
       }
-
     } else {
       setError(true);
       setResult(null);
@@ -121,7 +124,6 @@ function SkinTypeTest() {
 
   return (
     <div className="skin-test__container">
-      {/* TOP BAR */}
       <div className="skin-test__top-bar">
         <h2 className="skin-test__logo">Glow Genie</h2>
         <button className="skin-test__home-btn" onClick={() => navigate("/home-page")}>
@@ -129,11 +131,9 @@ function SkinTypeTest() {
         </button>
       </div>
 
-      {/* INSTRUCTIONS */}
       <p className="skin-test__instruction"><strong>Discover Your Skin Type</strong></p>
       <p className="skin-test__sub-instruction">Answer a few questions to find out which skin type matches you best.</p>
 
-      {/* FORM */}
       <form onSubmit={handleSubmit}>
         <div className="skin-test__questions-container">
           {questions.map((q, i) => (
@@ -162,12 +162,14 @@ function SkinTypeTest() {
         {error && (
           <p className="skin-test__error-message">Please fill in all questions.</p>
         )}
-        {result && (
-          <p className="skin-test__result">
-            Your skin type is... <span>{result}</span>
-          </p>
-        )}
       </form>
+
+      {/* 👇 Popup skintype ile birlikte gösterilir */}
+      <SkinTypePopup
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        skinType={result}
+      />
     </div>
   );
 }

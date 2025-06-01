@@ -20,6 +20,26 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
 }
+.page-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.wide-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 0.75rem 1.2rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: 1px solid #ccc;
+}
+
+.result-card {
+  max-width: 600px;
+  background: white;
+  border: 2px solid #e0e0e0;
+}
 
 /* Giriş alanı */
 input.form-control {
@@ -101,10 +121,16 @@ button.btn-primary:hover {
 
 /* Navbar */
 /* Navbar özelleştirmesi */
+/* Navbar genel */
 .navbar-custom {
-  background-color: transparent !important;
+  background-color: #fbebf6 !important;
   box-shadow: none !important;
   border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
 }
 
 .navbar-brand {
@@ -113,14 +139,16 @@ button.btn-primary:hover {
   color: #4b0082;
 }
 
-.nav-link {
+.navbar .nav-link {
   font-weight: 500;
   font-size: 1rem;
+  margin: 0 0.5rem;
 }
 
 .navbar .btn-outline-secondary {
   border-color: #6a1b9a;
   color: #6a1b9a;
+  margin-left: 0.5rem;
 }
 
 .navbar .btn-outline-secondary:hover {
@@ -128,3 +156,43 @@ button.btn-primary:hover {
   color: white;
 }
 
+
+
+
+@media (max-width: 768px) {
+  .page-wrapper {
+    padding: 0 1rem;
+  }
+
+  .wide-input,
+  .btn-lg,
+  input.form-control,
+  .form-select {
+    max-width: 100%;
+    width: 100%;
+  }
+
+ .navbar-custom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar .nav-link,
+  .navbar .btn-outline-secondary {
+    margin-top: 0.5rem;
+    margin-left: 0;
+  }
+
+  .navbar-brand {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-card {
+    padding: 1rem;
+  }
+
+  .text-muted {
+    font-size: 0.9rem;
+  }
+}

@@ -276,3 +276,27 @@ def update_profile(current_user):
         'message': 'Profil başarıyla güncellendi',
         'updated_profile': current_user.to_dict()
     }, 200
+
+@auth_bp.route('/profile', methods=['GET'])
+@token_required
+@swag_from({
+    'tags': ['User'],
+    'security': [{"Bearer": []}],
+    'responses': {
+        200: {
+            'description': 'Giriş yapan kullanıcının bilgileri',
+            'examples': {
+                'application/json': {
+                    'user_id': 1,
+                    'email': 'example@mail.com',
+                    'skin_type_id': 2,
+                    'skin_tone_id': 1,
+                    'allergens': [],
+                    'is_verified': True
+                }
+            }
+        }
+    }
+})
+def get_profile(current_user):
+    return jsonify(current_user.to_dict()), 200

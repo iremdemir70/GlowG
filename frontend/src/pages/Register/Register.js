@@ -208,7 +208,7 @@ const handleSubmit = (e) => {
 
           <div className="button-group">
             <button type="submit" className="submit-btn">Submit</button>
-            <button type="button" className="cancel-btn" onClick={() => navigate("/")}>Cancel</button>
+            <button type="button" className="cancel-btn" onClick={() => navigate("/home-page")}>Cancel</button>
           </div>
 
           {errors.mandatory && <p className="error">Please fill in all required fields.</p>}

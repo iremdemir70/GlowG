@@ -165,6 +165,16 @@ const HomePage = () => {
       <button type="button" onClick={goToForgotPassword} style={{ background: 'none', border: 'none', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
         Forgot Password?
       </button>
+  <p style={{ marginTop: '10px', fontSize: '0.95rem', textAlign: 'center' }}>
+    Don’t have an account?{" "}
+    <span
+      onClick={goToRegister}
+      style={{
+        color: '#4b0082',
+        cursor: 'pointer',
+        textDecoration: 'underline'
+      }}>  Register
+    </span> </p>
     </form>
   </div>
 ) : (

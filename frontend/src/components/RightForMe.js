@@ -4,9 +4,10 @@ import './RightForMe.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
+
 const Navbar = () => {
   const navigate = useNavigate();
-
   return (
     <nav className="navbar navbar-expand navbar-custom fixed-top px-4">
       <span className="navbar-brand fw-bold text-purple">Glow Genie</span>
@@ -25,24 +26,45 @@ const RightForMe = () => {
   const [input, setInput] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [predictionResult, setPredictionResult] = useState(null);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [userSkinType, setUserSkinType] = useState(null);
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:5000/categories')
-      .then(res => setCategories(res.data))
-      .catch(err => console.error('Category fetch error:', err));
-  }, []);
+useEffect(() => {
+  axios.get('http://127.0.0.1:5000/categories')
+    .then(res => setCategories(res.data))
+    .catch(err => console.error('Category fetch error:', err));
+}, []);
+
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  axios.get('http://127.0.0.1:5000/profile', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(res => {
+    const skinTypeName = res.data?.skin_type_name || null;
+    setUserSkinType(skinTypeName);
+  })
+  .catch(err => {
+    console.error('Profile fetch error:', err);
+    setUserSkinType(null);
+  });
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setPredictionResult(null);
     setLoading(true);
+    setResults([]);
+
+    const productNames = input
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name !== '');
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://127.0.0.1:5000/predict', {
-        product_name: input,
+      const res = await axios.post('http://127.0.0.1:5000/predict-multiple', {
+        product_names: productNames,
         category_id: parseInt(selectedCategory)
       }, {
         headers: {
@@ -51,10 +73,9 @@ const RightForMe = () => {
         }
       });
 
-      setPredictionResult(response.data);
+      setResults(res.data);
     } catch (err) {
-      console.error('Prediction error:', err);
-      setPredictionResult({ error: err.response?.data?.error || 'Unknown error' });
+      setResults([{ product_name: 'ERROR', error: err.response?.data?.error || 'Unknown error' }]);
     }
 
     setLoading(false);
@@ -64,31 +85,26 @@ const RightForMe = () => {
     <div className="container py-5">
       <Navbar />
 
-      <div className="text-center mt-5 pt-5">
-        <h4>Your skin type is...{' '}
-          <span className="badge badge-transparent">
-            {predictionResult?.suitability?.skin_type || '[Skin Type]'}
-          </span>
-        </h4>
-      </div>
+      <div className="page-wrapper mt-5 pt-5 text-center">
+        <h3 className="mb-3 text-purple">Is This Product Right For You?</h3>
+        {userSkinType && (
+  <div className="text-center mt-3">
+    <h5>Your skin type is: <span className="badge badge-transparent">{userSkinType}</span></h5>
+  </div>
+)}
 
-      <form onSubmit={handleSubmit} className="my-4 row justify-content-center">
-        <div className="col-md-8 d-flex gap-3">
+        <p className="text-muted mb-4">Enter multiple product names separated by commas</p>
+
+        <form onSubmit={handleSubmit} className="d-flex flex-column align-items-center gap-3">
           <input
             type="text"
-            className="form-control flex-grow-1"
-            placeholder="Enter product name..."
+            className="form-control wide-input"
+            placeholder="Example: CeraVe Cleanser, La Roche Tonic"
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
           />
-          <button type="submit" className="btn btn-primary btn-lg px-4">Submit</button>
-        </div>
-      </form>
-
-      <div className="row justify-content-center mb-4">
-        <div className="col-md-6">
           <select
-            className="form-select"
+            className="form-select wide-input"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -99,31 +115,37 @@ const RightForMe = () => {
               </option>
             ))}
           </select>
-        </div>
+          <button type="submit" className="btn btn-primary btn-lg">Submit</button>
+        </form>
+
+        {loading && (
+          <div className="text-center my-4">
+            <div className="spinner-border text-primary" role="status" />
+          </div>
+        )}
+
+        {results.length > 0 && (
+          <div className="mt-5">
+            {results.map((r, i) => (
+              <div key={i} className="result-card mx-auto p-4 shadow-sm mb-3 rounded-4 border text-start">
+                <h5 className="mb-2"><strong>{r.product_name}</strong></h5>
+                {r.error ? (
+                  <p className="text-danger">Error: {r.error}</p>
+                ) : (
+                  <>
+                    <p className={`fw-bold mb-2 ${r.suitability.label === 'Suitable' ? 'text-success' : 'text-danger'}`}>
+                      {r.suitability.label === 'Suitable' ? '✓ Suitable' : '✗ Not Suitable'}
+                    </p>
+                    <p><strong>Skin Type:</strong> {r.suitability.skin_type}</p>
+                    <p><strong>Probability:</strong> {(r.suitability.probability * 100).toFixed(1)}%</p>
+                    <p><strong>Ingredients:</strong> {r.ingredients.join(', ')}</p>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      {loading && (
-        <div className="text-center my-3">
-          <div className="spinner-border text-primary" role="status" />
-        </div>
-      )}
-
-      {predictionResult && (
-        <div className="text-center mt-4">
-          {predictionResult.error ? (
-            <div className="alert alert-danger">{predictionResult.error}</div>
-          ) : (
-            <>
-              <h5 className={`text-${predictionResult.suitability.label === 'Suitable' ? 'success' : 'danger'}`}>
-                {predictionResult.suitability.label === 'Suitable' ? '✓ Suitable' : '✗ Not Suitable'}
-              </h5>
-              <p><strong>Skin Type:</strong> {predictionResult.suitability.skin_type}</p>
-              <p><strong>Probability:</strong> {(predictionResult.suitability.probability * 100).toFixed(1)}%</p>
-              <p><strong>Ingredients:</strong> {predictionResult.ingredients.join(', ')}</p>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 };

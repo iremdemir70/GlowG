@@ -114,3 +114,132 @@ def predict(current_user):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@openai_bp.route('/predict-multiple', methods=['POST'])
+@token_required
+@swag_from({
+    'tags': ['AI Ingredients'],
+    'parameters': [
+        {
+            'name': 'body',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'product_names': {
+                        'type': 'array',
+                        'items': {'type': 'string'}
+                    },
+                    'category_id': {'type': 'integer'}
+                },
+                'required': ['product_names', 'category_id']
+            }
+        }
+    ],
+    'responses': {
+        200: {
+            'description': 'Birden fazla ürünün analiz sonucu döner',
+            'examples': {
+                'application/json': [
+                    {
+                        "product_name": "CeraVe",
+                        "ingredients": ["Aqua", "Glycerin"],
+                        "suitability": {
+                            "skin_type": "KURU",
+                            "probability": 0.82,
+                            "label": "Suitable"
+                        }
+                    },
+                    {
+                        "product_name": "La Roche",
+                        "ingredients": ["Alcohol", "Fragrance"],
+                        "suitability": {
+                            "skin_type": "KURU",
+                            "probability": 0.35,
+                            "label": "Not Suitable"
+                        }
+                    }
+                ]
+            }
+        },
+        400: {'description': 'Eksik veya hatalı veri'},
+        500: {'description': 'Sunucu hatası'}
+    }
+})
+def predict_multiple(current_user): 
+    data = request.get_json()
+    product_names = data.get("product_names")  # list
+    category_id = data.get("category_id")
+
+    if not product_names or not category_id:
+        return jsonify({'error': 'product_names ve category_id gerekli'}), 400
+    if not isinstance(product_names, list):
+        return jsonify({'error': 'product_names list olmalı'}), 400
+
+    user = current_user
+    skin_type = SkinType.query.get(user.skin_type_id)
+    if not skin_type or not skin_type.type_name:
+        return jsonify({'error': 'Kullanıcının cilt tipi tanımlı değil'}), 400
+
+    english_to_turkish = {
+        "OILY": "YAGLI",
+        "OILY SKIN": "YAGLI",
+        "DRY": "KURU",
+        "DRY SKIN": "KURU",
+        "COMBINATION": "KARMA",
+        "COMBINATION SKIN": "KARMA",
+        "NORMAL": "NORMAL",
+        "NORMAL SKIN": "NORMAL"
+    }
+
+    mapped = english_to_turkish.get(skin_type.type_name.upper().strip())
+    if not mapped:
+        return jsonify({'error': f"No model for skin type: {skin_type.type_name}"}), 400
+
+    results = []
+
+    for product_name in product_names:
+        existing = Product.query.filter_by(product_name=product_name, category_id=category_id).first()
+
+        if not existing:
+            now = datetime.now()
+            expiration_date = (now + timedelta(days=60)).strftime('%Y-%m-%d')
+            new_product = Product(
+                product_name=product_name,
+                category_id=category_id,
+                expiration_date=expiration_date
+            )
+            db.session.add(new_product)
+            db.session.commit()
+            product_id = new_product.product_id
+        else:
+            product_id = existing.product_id
+
+        try:
+            response = get_product_ingredients(product_name)
+            lines = []
+            for l in response.split("\n"):
+                lines += [x.strip() for x in l.split(",") if x.strip()]
+
+            save_exist_ingredients(product_id, lines)
+
+            prob, label = predict_suitability(product_id, mapped)
+
+            results.append({
+                "product_name": product_name,
+                "ingredients": lines,
+                "suitability": {
+                    "skin_type": skin_type.type_name,
+                    "probability": prob,
+                    "label": label
+                }
+            })
+        except Exception as e:
+            results.append({
+                "product_name": product_name,
+                "error": str(e)
+            })
+
+    return jsonify(results)

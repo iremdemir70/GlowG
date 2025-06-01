@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // yönlendirme için
 
 const LoginCard = () => {
   const [email, setEmail] = useState('');
@@ -22,13 +23,28 @@ const LoginCard = () => {
   return (
     <div>
       {!loggedIn ? (
-        <div id="card-ccontainer">
-          <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
+        <div id="loginCard">
+          <input
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="Password"
+          />
           <button onClick={login}>Login</button>
+          <p className="mt-2">
+            Don’t have an account?{" "}
+            <Link to="/register" style={{ color: "#4b0082", textDecoration: "underline" }}>
+              Register
+            </Link>
+          </p>
         </div>
       ) : (
-        <div id="card-container">
+        <div id="profileCard">
           <input value={email} readOnly />
           <button onClick={logout}>Logout</button>
         </div>

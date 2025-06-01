@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import './ForgotPassword.css';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function PasswordReset() {
@@ -19,6 +20,8 @@ export default function PasswordReset() {
   const [showProgress, setShowProgress] = useState(false);
   const [showWaitMessage, setShowWaitMessage] = useState(false);
   const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
+  const navigate = useNavigate();
+
 
   const inputRefs = useRef([]);
 
@@ -129,6 +132,21 @@ export default function PasswordReset() {
   return (
     <div className="container">
       <h2 className="logo text-center my-4">Glow Genie</h2>
+<div className="back-btn-container" style={{ position: 'absolute', top: '20px', left: '20px' }}>
+  <button
+    onClick={() => navigate('/home-page')}
+    style={{
+      background: 'none',
+      border: 'none',
+      fontSize: '1.5rem',
+      color: '#4b0082',
+      cursor: 'pointer'
+    }}
+    title="Back to Home"
+  >
+    ←
+  </button>
+</div>
 
       <div className="form-container container">
         <h4 className="mb-4 text-center">Please enter your new password</h4>
