@@ -7,7 +7,7 @@ import joblib
 from ctgan import CTGAN
 
 #loading the dataset
-data = pd.read_csv('SkinTypePrediction_Dataset.csv')
+data = pd.read_csv('ml/SkinTypePrediction/SkinTypePrediction_Dataset.csv')
 
 #viewing the data to see
 #print(data.head())
