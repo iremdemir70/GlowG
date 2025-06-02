@@ -176,7 +176,7 @@ header p {
     display: none !important;
   }
 }
-/* Overlay that darkens the entire screen */
+/* Pop-up overlay */
 .skin-popup-overlay {
   position: fixed;
   top: 0;
@@ -187,10 +187,10 @@ header p {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* make sure it sits above everything else */
+  z-index: 2000;
 }
 
-/* The white modal box in the center */
+/* Centered white box */
 .skin-popup-modal {
   background-color: #fff;
   padding: 2rem;
@@ -198,10 +198,9 @@ header p {
   text-align: center;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Optional: style the buttons inside */
 .skin-popup-modal button {
   margin: 0.5rem;
 }
