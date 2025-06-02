@@ -36,6 +36,7 @@ const HomePage = () => {
       })
       .then(data => {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("isLoggedIn", "true");
         setIsLoggedIn(true);
         setLoginError('');
         setUserId(data.user_id);
@@ -48,13 +49,32 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    if (userId) {
-      fetch(`http://127.0.0.1:5000/users/${userId}`)
-        .then(res => res.json())
-        .then(data => setUserData(data))
-        .catch(err => console.error("User data fetch failed:", err));
+    // Token varsa login kabul et ve profil çek
+    const token = localStorage.getItem("token");
+    const loginStatus = localStorage.getItem("isLoggedIn");
+
+    if (token && loginStatus === "true") {
+      setIsLoggedIn(true);
+
+      fetch("http://127.0.0.1:5000/profile", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Token expired or invalid");
+          return res.json();
+        })
+        .then(data => {
+          setUserData(data);
+          setUserId(data.id);
+        })
+        .catch(err => {
+          console.error("User data fetch failed:", err);
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+          localStorage.removeItem("isLoggedIn");
+        });
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/skin-types")
@@ -102,7 +122,11 @@ const HomePage = () => {
       });
   };
 
-  const logout = () => setIsLoggedIn(false);
+  const logout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+  };
 
   return (
     <div className="container">
@@ -141,105 +165,104 @@ const HomePage = () => {
           </div>
         )}
 
-{!isLoggedIn ? (
-  <div className="card-container">
-    <h2>Login</h2>
-    <form>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        required
-      />
-      {loginError && <p style={{ color: 'red' }}>{loginError}</p>}
+        {!isLoggedIn ? (
+          <div className="card-container">
+            <h2>Login</h2>
+            <form>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+              />
+              {loginError && <p style={{ color: 'red' }}>{loginError}</p>}
 
-      <button type="button" onClick={login}>Login</button>
-      <button type="button" onClick={goToForgotPassword} style={{ background: 'none', border: 'none', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
-        Forgot Password?
-      </button>
-  <p style={{ marginTop: '10px', fontSize: '0.95rem', textAlign: 'center' }}>
-    Don’t have an account?{" "}
-    <span
-      onClick={goToRegister}
-      style={{
-        color: '#4b0082',
-        cursor: 'pointer',
-        textDecoration: 'underline'
-      }}>  Register
-    </span> </p>
-    </form>
-  </div>
-) : (
-  <div className="card-container">
-    <h2>Profile</h2>
+              <button type="button" onClick={login}>Login</button>
+              <button type="button" onClick={goToForgotPassword} style={{ background: 'none', border: 'none', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
+                Forgot Password?
+              </button>
+              <p style={{ marginTop: '10px', fontSize: '0.95rem', textAlign: 'center' }}>
+                Don’t have an account?{" "}
+                <span
+                  onClick={goToRegister}
+                  style={{
+                    color: '#4b0082',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}>  Register
+                </span>
+              </p>
+            </form>
+          </div>
+        ) : (
+          <div className="card-container">
+            <h2>Profile</h2>
 
-    <input type="email" id="profileEmail" value={userData?.email || ''} readOnly />
+            <input type="email" value={userData?.email || ''} readOnly />
 
-    <select
-      value={isEditing ? userData?.skin_type_id || '' : skinTypes.find(t => t.id === userData?.skin_type_id)?.name || userData?.skin_type_name || ''}
-      onChange={isEditing ? e => setUserData({ ...userData, skin_type_id: parseInt(e.target.value) }) : undefined}
-      disabled={!isEditing}
-    >
-      {!isEditing && <option>{userData?.skin_type_name || "Not set"}</option>}
-      {isEditing && <>
-        <option value="">Select skin type</option>
-        {skinTypes.map(type => (
-          <option key={type.id} value={type.id}>{type.name}</option>
-        ))}
-      </>}
-    </select>
+            <select
+              value={isEditing ? userData?.skin_type_id || '' : skinTypes.find(t => t.id === userData?.skin_type_id)?.name || userData?.skin_type_name || ''}
+              onChange={isEditing ? e => setUserData({ ...userData, skin_type_id: parseInt(e.target.value) }) : undefined}
+              disabled={!isEditing}
+            >
+              {!isEditing && <option>{userData?.skin_type_name || "Not set"}</option>}
+              {isEditing && <>
+                <option value="">Select skin type</option>
+                {skinTypes.map(type => (
+                  <option key={type.id} value={type.id}>{type.name}</option>
+                ))}
+              </>}
+            </select>
 
-    <select
-      value={isEditing ? userData?.skin_tone_id || '' : skinTones.find(t => t.id === userData?.skin_tone_id)?.name || userData?.skin_tone_name || ''}
-      onChange={isEditing ? e => setUserData({ ...userData, skin_tone_id: parseInt(e.target.value) }) : undefined}
-      disabled={!isEditing}
-    >
-      {!isEditing && <option>{userData?.skin_tone_name || "Not set"}</option>}
-      {isEditing && <>
-        <option value="">Select skin tone</option>
-        {skinTones.map(tone => (
-          <option key={tone.id} value={tone.id}>{tone.name}</option>
-        ))}
-      </>}
-    </select>
+            <select
+              value={isEditing ? userData?.skin_tone_id || '' : skinTones.find(t => t.id === userData?.skin_tone_id)?.name || userData?.skin_tone_name || ''}
+              onChange={isEditing ? e => setUserData({ ...userData, skin_tone_id: parseInt(e.target.value) }) : undefined}
+              disabled={!isEditing}
+            >
+              {!isEditing && <option>{userData?.skin_tone_name || "Not set"}</option>}
+              {isEditing && <>
+                <option value="">Select skin tone</option>
+                {skinTones.map(tone => (
+                  <option key={tone.id} value={tone.id}>{tone.name}</option>
+                ))}
+              </>}
+            </select>
 
-    <input
-      type="text"
-      placeholder="Allergens: Paraben, Alcohol, etc."
-      value={(userData?.allergens || []).join(', ')}
-      onChange={isEditing ? e =>
-        setUserData({
-          ...userData,
-          allergens: e.target.value.split(',').map(item => item.trim())
-        }) : undefined}
-      readOnly={!isEditing}
-    />
+            <input
+              type="text"
+              placeholder="Allergens: Paraben, Alcohol, etc."
+              value={(userData?.allergens || []).join(', ')}
+              onChange={isEditing ? e =>
+                setUserData({
+                  ...userData,
+                  allergens: e.target.value.split(',').map(item => item.trim())
+                }) : undefined}
+              readOnly={!isEditing}
+            />
 
-    <div style={{ textAlign: 'center', marginTop: 10, fontSize: 16 }}>
-      <a href="/update-password" id="changePasswordLink">Change Password</a>
-    </div>
+            <div style={{ textAlign: 'center', marginTop: 10, fontSize: 16 }}>
+              <a href="/update-password" id="changePasswordLink">Change Password</a>
+            </div>
 
-    {!isEditing ? (
-      <button onClick={() => setIsEditing(true)}>Edit Profile</button>
-    ) : (
-      <>
-        <button onClick={updateProfile}>Update</button>
-        <button onClick={() => setIsEditing(false)}>Cancel</button>
-      </>
-    )}
-    <button onClick={logout}>Log Out</button>
-  </div>
-)}
-
-
+            {!isEditing ? (
+              <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+            ) : (
+              <>
+                <button onClick={updateProfile}>Update</button>
+                <button onClick={() => setIsEditing(false)}>Cancel</button>
+              </>
+            )}
+            <button onClick={logout}>Log Out</button>
+          </div>
+        )}
       </main>
     </div>
   );
