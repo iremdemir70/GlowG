@@ -14,6 +14,7 @@ import Navbar from './components/Navbar';
 import './pages/SkinTypeTest/SkinTypeTest.css';
 import './components/RightForMe.css';
 import './index.css';
+import SuggestPage from './pages/SuggestPage/SuggestPage';
 
 function App() {
   return (
@@ -50,6 +51,8 @@ function MainLayout() {
       <Route path="/register" element={<Register />} />
       <Route path="/product-page" element={<ProductPage />} />
       <Route path="/product-right-for-me" element={<RightForMe />} />
+      <Route path="/suggest-page" element={<SuggestPage />} />
+
     </Routes>
 
     </>

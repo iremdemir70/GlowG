@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './UpdatePassword.css';
 
 const UpdatePassword = () => {
+  const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -83,6 +86,26 @@ const UpdatePassword = () => {
     <div className="container mt-4">
       <h2 className="logo text-center my-4">Glow Genie</h2>
 
+      {/* Back to Home Button */}
+      <div
+        className="back-btn-container"
+        style={{ position: 'absolute', top: '20px', left: '20px' }}
+      >
+        <button
+          onClick={() => navigate('/home-page')}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            color: '#4b0082',
+            cursor: 'pointer'
+          }}
+          title="Back to Home"
+        >
+          ←
+        </button>
+      </div>
+
       <div className="form-container container">
         <h4 className="mb-4 text-center">Please enter your new password</h4>
 
@@ -140,18 +163,24 @@ const UpdatePassword = () => {
 
             <p className="resend-text">
               Didn't receive an email?{' '}
-            <button
-              type="button"
-              className={`custom-purple resend-link ${resendDisabled ? 'disabled' : ''}`}
-              id="resend-link"
-              onClick={handleResend}
-              disabled={resendDisabled}
-              style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
-            >
-              Resend link
-            </button>
+              <button
+                type="button"
+                className={`custom-purple resend-link ${resendDisabled ? 'disabled' : ''}`}
+                id="resend-link"
+                onClick={handleResend}
+                disabled={resendDisabled}
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  padding: 0,
+                  color: 'inherit',
+                  textDecoration: 'underline',
+                  cursor: 'pointer'
+                }}
+              >
+                Resend link
+              </button>
             </p>
-
 
             {showWaitMessage && (
               <p className="wait-message" style={{ color: 'green' }}>
