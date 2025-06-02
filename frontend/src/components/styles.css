@@ -1,0 +1,100 @@
+/* Ana İçerik */
+main {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Uyarı Mesajı */
+.login-warning {
+  color: red;
+  font-size: 14px;
+}
+
+
+/* Register ve Forgot Password Linkleri */
+.forgot-password,
+.register a {
+  color: #5a0080;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password:hover,
+.register a:hover {
+  text-decoration: underline;
+}
+
+
+/* Change Password Link */
+#changePasswordLink {
+  color: #5a0080;
+  text-decoration: none;
+}
+
+#changePasswordLink:hover {
+  color: #a05fcf;
+  text-decoration: underline;
+}
+
+/* Responsive: Mobil Cihazlar */
+@media (max-width: 600px) {
+  .popup {
+    width: 90%;
+    top: 20%;
+    transform: translate(-50%, -20%);
+    padding: 15px;
+  }
+
+  .popup-buttons {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .popup-btn-container {
+    width: 100%;
+  }
+
+  .popup-buttons button {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .popup-description {
+    font-size: 14px;
+  }
+
+  .popup-btn-container p {
+    font-size: 13px;
+    text-align: center;
+  }
+}
+
+/* Responsive: Tablet ve Küçük Ekranlar */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logincard,
+  .options,
+  #profileCard {
+    width: 90%;
+    margin-top: 20px;
+  }
+
+  .option-btn {
+    width: 100%;
+    height: auto;
+    padding: 15px;
+    font-size: 16px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
