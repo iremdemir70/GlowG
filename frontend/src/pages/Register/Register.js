@@ -34,7 +34,7 @@ const RegisterForm = () => {
     mandatory: false,
   });
 
-  const passwordPattern = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[^A-Za-z0-9])/;
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

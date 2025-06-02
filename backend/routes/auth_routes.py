@@ -160,7 +160,7 @@ def register_user():
     return {'message': 'Kayıt başarılı, doğrulama maili gönderildi.'}, 201
 
 
-@auth_bp.route('/verify/<path:email>', methods=['GET'])
+@auth_bp.route('/verify', methods=['GET'])
 def verify_email():
     token = request.args.get('token')
     if not token:
@@ -179,7 +179,6 @@ def verify_email():
         return jsonify({"error": "Token süresi dolmuş"}), 400
     except jwt.InvalidTokenError:
         return jsonify({"error": "Token geçersiz"}), 400
-
 
 
 # login user
