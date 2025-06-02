@@ -4,7 +4,7 @@ import pandas as pd
 
 from database.db import db
 from models.product import Product        # <-- SQLAlchemy modelınızın adı ve konumu
-from ml.mlpredictor import build_feature_vector, predict_suitability, ML_MODELS
+from ml.ml_predictor import build_feature_vector, predict_suitability, ML_MODELS
 
 skin_bp = Blueprint('skin_bp', __name__)
 
