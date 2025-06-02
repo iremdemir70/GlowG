@@ -4,8 +4,6 @@ import './RightForMe.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-
-
 const Navbar = () => {
   const navigate = useNavigate();
   return (
@@ -23,6 +21,7 @@ const Navbar = () => {
 };
 
 const RightForMe = () => {
+  const navigate = useNavigate(); // 🔧 Eklendi
   const [input, setInput] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -30,26 +29,32 @@ const RightForMe = () => {
   const [loading, setLoading] = useState(false);
   const [userSkinType, setUserSkinType] = useState(null);
 
-useEffect(() => {
-  axios.get('http://127.0.0.1:5000/categories')
-    .then(res => setCategories(res.data))
-    .catch(err => console.error('Category fetch error:', err));
-}, []);
+  useEffect(() => {
+    axios.get('http://127.0.0.1:5000/categories')
+      .then(res => setCategories(res.data))
+      .catch(err => console.error('Category fetch error:', err));
+  }, []);
 
-useEffect(() => {
-  const token = localStorage.getItem('token');
-  axios.get('http://127.0.0.1:5000/profile', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  .then(res => {
-    const skinTypeName = res.data?.skin_type_name || null;
-    setUserSkinType(skinTypeName);
-  })
-  .catch(err => {
-    console.error('Profile fetch error:', err);
-    setUserSkinType(null);
-  });
-}, []);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://127.0.0.1:5000/profile', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      const skinTypeName = res.data?.skin_type_name || null;
+      setUserSkinType(skinTypeName);
+
+      if (!skinTypeName || skinTypeName === 'Unknown') {
+        alert("Lütfen önce cilt tipi testini çözerek cilt tipinizi belirleyin.");
+        navigate('/skin-type-test');
+      }
+    })
+    .catch(err => {
+      console.error('Profile fetch error:', err);
+      setUserSkinType(null);
+      navigate('/skin-type-test');
+    });
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,11 +92,12 @@ useEffect(() => {
 
       <div className="page-wrapper mt-5 pt-5 text-center">
         <h3 className="mb-3 text-purple">Is This Product Right For You?</h3>
+
         {userSkinType && (
-  <div className="text-center mt-3">
-    <h5>Your skin type is: <span className="badge badge-transparent">{userSkinType}</span></h5>
-  </div>
-)}
+          <div className="text-center mt-3">
+            <h5>Your skin type is: <span className="badge badge-transparent">{userSkinType}</span></h5>
+          </div>
+        )}
 
         <p className="text-muted mb-4">Enter multiple product names separated by commas</p>
 
