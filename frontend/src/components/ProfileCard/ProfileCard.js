@@ -45,7 +45,7 @@ const ProfileCard = ({
   };
 
   return (
-    <div className="card-container">
+    <div id="profileCard" className="card-container">
       <h2>Profile</h2>
 
       <input type="email" value={email || ''} readOnly />
