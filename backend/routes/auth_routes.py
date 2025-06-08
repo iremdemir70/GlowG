@@ -148,7 +148,7 @@ def register_user():
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
     # ✅ Email gönder
-    verify_link = f"http://127.0.0.1:5000/verify?token={verify_token}"
+    verify_link = f"http://localhost:3000/home-page?token={verify_token}"
     msg = Message(
         subject="GlowGenie Hesabını Doğrula",
         sender=current_app.config['MAIL_USERNAME'],
@@ -299,3 +299,67 @@ def update_profile(current_user):
 })
 def get_profile(current_user):
     return jsonify(current_user.to_dict()), 200
+
+
+# forgot-password
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json()
+    email = data.get('email')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'Kullanıcı bulunamadı'}), 404
+
+    # Sadece email'i token içine koyuyoruz
+    reset_token = jwt.encode({
+        'email': email,
+        'exp': datetime.utcnow() + timedelta(hours=1)
+    }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+    reset_link = f"http://localhost:3000/reset-password?reset_token={reset_token}"
+
+    msg = Message(
+        subject="GlowGenie Password Reset",
+        sender=current_app.config['MAIL_USERNAME'],
+        recipients=[email],
+        body=f"""Merhaba {email},
+
+Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:
+
+{reset_link}
+
+Eğer bu isteği siz yapmadıysanız, bu mesajı yok sayabilirsiniz.
+"""
+    )
+    try:
+        mail.send(msg)
+    except Exception as e:
+        return jsonify({'error': 'Mail gönderilemedi', 'detail': str(e)}), 500
+
+    return jsonify({'message': 'Sıfırlama bağlantısı gönderildi'}), 200
+
+
+# reset password
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    token = data.get('reset_token')
+    new_password = data.get('new_password')
+
+    try:
+        payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+        email = payload['email']
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            db.session.commit()
+            return jsonify({'message': 'Şifre başarıyla güncellendi'}), 200
+        return jsonify({'error': 'Kullanıcı bulunamadı'}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Token süresi dolmuş'}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Geçersiz token'}), 400

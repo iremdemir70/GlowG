@@ -16,6 +16,7 @@ import SkinTypeTestPopup from './components/SkinTypePopup/SkinTypeTestPopup'; //
 import './pages/SkinTypeTest/SkinTypeTest.css';
 import './components/RightForMe.css';
 import './index.css';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function MainLayout() {
         <Route path="/product-right-for-me" element={<RightForMe />} />
         <Route path="/suggest-page" element={<SuggestPage />} />
         <Route path="/skin-type-popup" element={<SkinTypeTestPopup />} /> {/* EKLENDİ */}
+        <Route path="/reset-password" element={<ResetPassword />} />
+
       </Routes>
     </>
   );
