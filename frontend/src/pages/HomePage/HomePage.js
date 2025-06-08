@@ -27,14 +27,25 @@ const HomePage = () => {
   const goToRightForMe = () => navigate('/product-right-for-me');
   const goToSuggestPage = () => navigate('/suggest-page');
 
-  const onLoginSuccess = (data) => {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("isLoggedIn", "true");
-    setIsLoggedIn(true);
-    setUserData(data); // data includes user profile info
-    setShowPopup(false);
-    alert("Login Successful!");
-  };
+const onLoginSuccess = (data) => {
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("isLoggedIn", "true");
+  setIsLoggedIn(true);
+  setShowPopup(false);
+  alert("Login Successful!");
+
+  fetch("http://127.0.0.1:5000/profile", {
+    headers: { Authorization: `Bearer ${data.token}` }
+  })
+    .then(res => res.json())
+    .then(profileData => {
+      setUserData(profileData);
+    })
+    .catch(err => {
+      console.error("Failed to fetch user profile after login:", err);
+    });
+};
+
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
