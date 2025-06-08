@@ -1,0 +1,62 @@
+/* Base Styling */
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ortala */
+  gap: 20px;
+  margin-top: 50px;
+  padding: 0 20px;
+}
+
+.option-btn {
+  width: 250px;
+  height: 80px;
+  background-color: transparent;
+  border: 2px solid #c797eb;
+  color: #5a0080;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.option-btn:hover {
+  background-color: #c797eb;
+  color: white;
+}
+
+/* Tablet ve Küçük Ekranlar */
+@media (max-width: 768px) {
+  .options {
+    width: 100%;
+    margin-top: 30px;
+    gap: 15px;
+  }
+
+  .option-btn {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    padding: 15px 10px;
+    font-size: 15px;
+  }
+}
+
+/* Mobil Cihazlar */
+@media (max-width: 480px) {
+  .options {
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .option-btn {
+    font-size: 14px;
+    padding: 12px 8px;
+    border-radius: 15px;
+  }
+
+  .option-btn:hover {
+    background-color: #b07ad6;
+  }
+}

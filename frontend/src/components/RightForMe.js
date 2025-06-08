@@ -4,17 +4,48 @@ import './RightForMe.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// ✅ Navbar bileşeni
 const Navbar = () => {
+  const [navActive, setNavActive] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // 👈 Menü açık mı?
   const navigate = useNavigate();
+
+  const toggleMenu = () => {
+    const mainListDiv = document.getElementById('mainListDiv');
+    if (mainListDiv) {
+      mainListDiv.classList.toggle('show_list');
+    }
+    setMenuOpen(prev => !prev); // 👈 Menü durumunu değiştir
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setNavActive(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="navbar navbar-expand navbar-custom fixed-top px-4">
-      <span className="navbar-brand fw-bold text-purple">Glow Genie</span>
-      <div className="d-flex gap-4 align-items-center ms-auto">
-        <a href="#" className="nav-link text-dark">About</a>
-        <a href="#" className="nav-link text-dark">Contact</a>
-        <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate('/home-page')}>
-          <i className="fa fa-home"></i>
-        </button>
+    <nav className={`nav ${navActive ? 'affix' : ''}`}>
+      <div className="container">
+        <div className="logo">
+          <a href="#">Glow Genie</a>
+        </div>
+        <div id="mainListDiv" className="main_list">
+          <ul className="navlinks">
+            <li><a href="#" className="btn-info">About</a></li>
+            <li><a href="#" className="btn-info">Contact</a></li>
+            <li>
+              <button className="btn" onClick={() => navigate('/home-page')}>
+                {menuOpen ? 'Home' : <i className="fa fa-home"></i>}
+              </button>
+            </li>
+          </ul>
+        </div>
+        <span className="navTrigger" onClick={toggleMenu}>
+          <i></i><i></i><i></i>
+        </span>
       </div>
     </nav>
   );
@@ -35,6 +66,7 @@ const RightForMe = () => {
       .catch(err => console.error('Category fetch error:', err));
   }, []);
 
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://127.0.0.1:5000/profile', {
@@ -46,13 +78,13 @@ const RightForMe = () => {
 
       if (!skinTypeName || skinTypeName === 'Unknown') {
         alert("Lütfen önce cilt tipi testini çözerek cilt tipinizi belirleyin.");
-        navigate('/skin-type-test');
+       // navigate('/skin-type-test');
       }
     })
     .catch(err => {
       console.error('Profile fetch error:', err);
       setUserSkinType(null);
-      navigate('/skin-type-test');
+      //navigate('/skin-type-test');
     });
   }, [navigate]);
 
@@ -89,6 +121,7 @@ const RightForMe = () => {
   return (
     <div className="container py-5">
       <Navbar />
+
 
       <div className="page-wrapper mt-5 pt-5 text-center">
         <h3 className="mb-3 text-purple">Is This Product Right For You?</h3>
@@ -152,7 +185,9 @@ const RightForMe = () => {
           </div>
         )}
       </div>
+      <div style={{ height: 1000 }} />
     </div>
+    
   );
 };
 

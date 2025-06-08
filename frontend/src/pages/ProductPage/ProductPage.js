@@ -1,14 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import './ProductPage.css';
-
+import { Link } from 'react-router-dom';
 const ProductPage = () => {
+  const [navActive, setNavActive] = useState(false);
   const [allProducts, setAllProducts] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [tempSelectedCategories, setTempSelectedCategories] = useState([]);
   const [visibleCount, setVisibleCount] = useState(8); // 2 satır (4x2)
+  const Navbar = () => (
+    <nav className={`nav ${navActive ? 'affix' : ''}`}>
+      <div className="container">
+        <div className="logo">
+          <a href="#">Glow Genie</a>
+        </div>
+        <div id="mainListDiv" className="main_list">
+          <ul className="navlinks">
+            <li><a href="#" className="btn-info">About</a></li>
+            <li><a href="#" className="btn-info">Contact</a></li>
+            <li>
+  <Link to="/home-page" className="btn home-icon-link">
+    <span className="home-icon"><i className="fa fa-home"></i></span>
+    <span className="home-text">Home</span>
+  </Link>
+</li>
+          </ul>
+        </div>
+        <span className="navTrigger" onClick={toggleMenu}>
+          <i></i><i></i><i></i>
+        </span>
+      </div>
+    </nav>
+  );
+    useEffect(() => {
+    const handleScroll = () => {
+      setNavActive(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
+  const toggleMenu = () => {
+    const mainListDiv = document.getElementById('mainListDiv');
+    if (mainListDiv) {
+      mainListDiv.classList.toggle('show_list');
+    }
+  };
   useEffect(() => {
     fetch("http://127.0.0.1:5000/products")
       .then(res => res.json())
@@ -54,6 +92,9 @@ const ProductPage = () => {
 
   return (
     <div>
+      <Navbar />
+      <br></br> <br></br> <br>
+      </br>
       <main className="main-content">
         <h2 className="section-title">
           Our registered products that we can recommend to you
@@ -124,7 +165,11 @@ const ProductPage = () => {
         >
           View More
         </button>
+        
       )}
+       <div style={{ height: '1000px' }}>
+        {/* Scroll efektini göstermek için boş alan */}
+      </div>
     </div>
   );
 };

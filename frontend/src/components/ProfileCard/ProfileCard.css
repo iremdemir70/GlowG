@@ -1,0 +1,73 @@
+/* Profile Card */
+#profileCard {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#profileCard.hidden {
+  display: none;
+}
+
+#profileCard h2 {
+  color: #5a0080;
+  margin-bottom: 20px;
+}
+
+#profileCard input,
+#profileCard select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #c797eb;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+#profileCard button {
+  width: 100%;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #c797eb;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#profileCard button:hover {
+  background-color: #a05fcf;
+}
+
+/* Change Password Link */
+#changePasswordLink {
+  color: #5a0080;
+  text-decoration: none;
+}
+
+#changePasswordLink:hover {
+  color: #a05fcf;
+  text-decoration: underline;
+}
+
+/* Responsive: Tablet ve Küçük Ekranlar */
+@media (max-width: 768px) {
+  #profileCard {
+    width: 90%;
+    margin-top: 20px;
+  }
+}
+.update-message {
+  font-weight: bold;
+  font-size: 14px;
+  color: green;
+  margin-top: 10px;
+  text-align: center;
+}

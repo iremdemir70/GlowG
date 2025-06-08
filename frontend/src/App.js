@@ -10,11 +10,12 @@ import SkinTypeTest from './pages/SkinTypeTest/SkinTypeTest';
 import Register from './pages/Register/Register';
 import ProductPage from './pages/ProductPage/ProductPage';
 import RightForMe from './components/RightForMe';
-import Navbar from './components/Navbar'; 
+import SuggestPage from './pages/SuggestPage/SuggestPage';
+import SkinTypeTestPopup from './components/SkinTypePopup/SkinTypeTestPopup'; // EKLENDİ
+
 import './pages/SkinTypeTest/SkinTypeTest.css';
 import './components/RightForMe.css';
 import './index.css';
-import SuggestPage from './pages/SuggestPage/SuggestPage';
 
 function App() {
   return (
@@ -27,34 +28,23 @@ function App() {
 function MainLayout() {
   const location = useLocation();
 
-  const hideNavbarPaths = [
-    '/skin-type-test',
-    '/update-password',
-    '/forgot-password',
-    '/register-verification',
-    '/register',
-    '/product-right-for-me'
-  ];
-
-  const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
-
+  
   return (
     <>
-      {!shouldHideNavbar && <Navbar />}
-    <Routes>
-      <Route path="/" element={<HomePage />} /> {/* Ana sayfa */}
-      <Route path="/home-page" element={<HomePage />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/register-verification" element={<RegisterVerification />} />
-      <Route path="/update-password" element={<UpdatePassword />} />
-      <Route path="/skin-type-test" element={<SkinTypeTest />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/product-page" element={<ProductPage />} />
-      <Route path="/product-right-for-me" element={<RightForMe />} />
-      <Route path="/suggest-page" element={<SuggestPage />} />
-
-    </Routes>
-
+      {/*{!shouldHideNavbar && <Navbar />}*/}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home-page" element={<HomePage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/register-verification" element={<RegisterVerification />} />
+        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/skin-type-test" element={<SkinTypeTest />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/product-page" element={<ProductPage />} />
+        <Route path="/product-right-for-me" element={<RightForMe />} />
+        <Route path="/suggest-page" element={<SuggestPage />} />
+        <Route path="/skin-type-popup" element={<SkinTypeTestPopup />} /> {/* EKLENDİ */}
+      </Routes>
     </>
   );
 }
