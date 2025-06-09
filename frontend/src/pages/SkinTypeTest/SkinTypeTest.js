@@ -162,6 +162,13 @@ function SkinTypeTest() {
         {error && (
           <p className="skin-test__error-message">Please fill in all questions.</p>
         )}
+
+        {result && (
+        <div className="text-center mt-4">
+          <h5>Your skin type is: <span className="badge badge-transparent">{result}</span></h5>
+        </div>
+      )}
+
       </form>
 
       {/* 👇 Popup skintype ile birlikte gösterilir */}
