@@ -176,7 +176,6 @@ const RightForMe = () => {
                       {r.suitability.label === 'Suitable' ? '✓ Suitable' : '✗ Not Suitable'}
                     </p>
                     <p><strong>Skin Type:</strong> {r.suitability.skin_type}</p>
-                    <p><strong>Probability:</strong> {(r.suitability.probability * 100).toFixed(1)}%</p>
                     <p><strong>Ingredients:</strong> {r.ingredients.join(', ')}</p>
                   </>
                 )}
