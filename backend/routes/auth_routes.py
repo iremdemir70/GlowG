@@ -148,7 +148,7 @@ def register_user():
     }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
     # ✅ Email gönder
-    verify_link = f"http://localhost:3000/home-page?token={verify_token}"
+    verify_link = f"http://127.0.0.1:5000/verify?token={verify_token}"
     msg = Message(
         subject="GlowGenie Hesabını Doğrula",
         sender=current_app.config['MAIL_USERNAME'],
