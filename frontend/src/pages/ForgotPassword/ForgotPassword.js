@@ -1,22 +1,29 @@
 import React, { useState } from "react";
 import './ForgotPassword.css';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!email) {
-      setMessage("❌ Please enter your email.");
+      setError("❌ Please enter your email.");
       return;
     }
 
     try {
       await axios.post("http://127.0.0.1:5000/forgot-password", { email });
-      setMessage("✅ Reset link has been sent to your email.");
+
+      // localStorage'a maili kaydet
+      localStorage.setItem("registeredEmail", email);
+
+      // yönlendir
+      navigate("/register-verification");
     } catch (err) {
-      setMessage("❌ Failed to send reset link.");
+      setError("❌ Failed to send reset link.");
     }
   };
 
@@ -39,7 +46,7 @@ export default function ForgotPassword() {
           />
         </div>
 
-        <p className="text-center">{message}</p>
+        <p className="text-center">{error}</p>
 
         <div className="text-center">
           <button className="submit-btn" onClick={handleSubmit}>Submit</button>
