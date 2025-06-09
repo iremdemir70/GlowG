@@ -11,7 +11,7 @@ import shap
 import pickle
 
 # Loading CSV into DataFrame
-df = pd.read_csv("ml/productsuitability/products_dataset.csv", encoding="ISO-8859-9")
+df = pd.read_csv("backend/ml/productsuitability/products_dataset.csv", encoding="ISO-8859-9")
 
 # Pivoting to wide format: one row per (ürün adı, kategori, cilt tipi), columns = each içerik
 pivot_df = df.pivot_table(
@@ -97,51 +97,51 @@ for skin in skin_types:
     )
     base_model.fit(X_res, y_res)
 
-    # Building SHAP explainer using the resampled training set
-    explainer = shap.TreeExplainer(base_model)
-    shap_values = explainer.shap_values(X_res)
-    # Extracting class-1 SHAP (some versions return list of arrays, others a 3D array)
-    if isinstance(shap_values, list):
-        shap_vals_class1 = shap_values[1]
-    elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
-        shap_vals_class1 = shap_values[:, :, 1]
-    else:
-        shap_vals_class1 = shap_values
+# Building SHAP explainer using the resampled training set
+explainer = shap.TreeExplainer(base_model)
+shap_values = explainer.shap_values(X_res)
+# Extracting class-1 SHAP (some versions return list of arrays, others a 3D array)
+if isinstance(shap_values, list):
+    shap_vals_class1 = shap_values[1]
+elif isinstance(shap_values, np.ndarray) and shap_values.ndim == 3:
+    shap_vals_class1 = shap_values[:, :, 1]
+else:
+    shap_vals_class1 = shap_values
 
-    # Feature selection via SHAP for YAĞLI & KARMA (top 15 by mean |SHAP|)
-    if skin in ["YAGLI", "KARMA"]:
-        mean_abs_shap = pd.DataFrame({
-            "feature": X_res.columns.tolist(),
-            "mean_abs_shap": np.abs(shap_vals_class1).mean(axis=0)
-        }).sort_values(by="mean_abs_shap", ascending=False)
-        top15 = mean_abs_shap["feature"].head(15).tolist()
-        print(f"📌 Top SHAP features for {skin}: {top15}")
-        feature_list = top15
-    else:
-        print(f"ℹ️ Skipping feature selection for {skin}")
-        feature_list = X_res.columns.tolist()
+# Feature selection via SHAP for YAĞLI & KARMA (top 15 by mean |SHAP|)
+if skin in ["YAGLI", "KARMA"]:
+    mean_abs_shap = pd.DataFrame({
+        "feature": X_res.columns.tolist(),
+        "mean_abs_shap": np.abs(shap_vals_class1).mean(axis=0)
+    }).sort_values(by="mean_abs_shap", ascending=False)
+    top15 = mean_abs_shap["feature"].head(15).tolist()
+    print(f"📌 Top SHAP features for {skin}: {top15}")
+    feature_list = top15
+else:
+    print(f"ℹ️ Skipping feature selection for {skin}")
+    feature_list = X_res.columns.tolist()
 
-    # Retraining final RandomForest on the SMOTEd training set using only feature_list
-    X_res_sel = X_res[feature_list]
-    X_test_sel = X_test[feature_list]
+# Retraining final RandomForest on the SMOTEd training set using only feature_list
+X_res_sel = X_res[feature_list]
+X_test_sel = X_test[feature_list]
 
-    final_model = RandomForestClassifier(n_estimators=100, random_state=42)
-    final_model.fit(X_res_sel, y_res)
+final_model = RandomForestClassifier(n_estimators=100, random_state=42)
+final_model.fit(X_res_sel, y_res)
 
-    # Storing (model, explainer, feature_list) for this skin type
-    models_explainers[skin] = (final_model, explainer, feature_list)
+# Storing (model, explainer, feature_list) for this skin type
+models_explainers[skin] = (final_model, explainer, feature_list)
 
-    # Evaluating on hold-out test fold
-    y_pred = final_model.predict(X_test_sel)
-    y_proba = final_model.predict_proba(X_test_sel)[:, 1]
+# Evaluating on hold-out test fold
+y_pred = final_model.predict(X_test_sel)
+y_proba = final_model.predict_proba(X_test_sel)[:, 1]
 
-    print("\n📈 Classification Report:")
-    print(classification_report(y_test, y_pred, target_names=["Not Suitable", "Suitable"]))
-    try:
-        auc = roc_auc_score(y_test, y_proba)
-        print(f"🔍 ROC-AUC Score: {auc:.3f}")
-    except ValueError:
-        print("⚠️ ROC-AUC could not be computed.")
+print("\n📈 Classification Report:")
+print(classification_report(y_test, y_pred, target_names=["Not Suitable", "Suitable"]))
+try:
+    auc = roc_auc_score(y_test, y_proba)
+    print(f"🔍 ROC-AUC Score: {auc:.3f}")
+except ValueError:
+    print("⚠️ ROC-AUC could not be computed.")
 
 # Defining a function to explain a single product for a given skin
 def explain_product(product_name: str, skin: str):
@@ -189,9 +189,9 @@ def explain_product(product_name: str, skin: str):
 
 # Defining a callback for when a new product is added
 def on_new_product_added(product_name: str):
-    """
-    Triggered after a new product is inserted. Assumes pivot_df includes that product.
-    """
+    
+    #Triggered after a new product is inserted. Assumes pivot_df includes that product.
+    
     for skin in skin_types:
         result = explain_product(product_name, skin)
         if result is None:
@@ -201,14 +201,6 @@ def on_new_product_added(product_name: str):
         # Building JSON-like list of top 5 features with SHAP values
         top5 = sv_series.abs().sort_values(ascending=False).index[:5].tolist()
         top5_with_vals = [{"feature": f, "shap": float(sv_series[f])} for f in top5]
-
-        # Here, write these results back to your database (example pseudocode):
-        # save_explanation_to_db(
-        #     product_name=product_name,
-        #     skin_type=skin,
-        #     suitability_probability=prob,
-        #     top_features_json=top5_with_vals
-        # )
 
         print(f"\n→ Saved explanation for '{product_name}' as skin='{skin}':")
         print(f"   • probability = {prob:.3f}")
