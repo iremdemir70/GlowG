@@ -28,5 +28,5 @@ def predict_suitability(product_id, skin_type):
     features = model.feature_names_in_
     X = build_feature_vector(product_id, features)
     prob = model.predict_proba(X)[0, 1]
-    label = "Suitable" if prob >= 0.5 else "Not Suitable"
+    label = "Suitable" if prob >= 0.3 else "Not Suitable"
     return round(float(prob), 3), label
