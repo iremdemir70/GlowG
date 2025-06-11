@@ -181,6 +181,45 @@ def verify_email():
         return redirect("http://localhost:3000/home-page?verified=expired")
     except jwt.InvalidTokenError:
         return redirect("http://localhost:3000/home-page?verified=invalid")
+    
+
+#resend
+@auth_bp.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email gerekli'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'Kullanıcı bulunamadı'}), 404
+
+    if user.is_verified:
+        return jsonify({'message': 'Zaten doğrulanmış'}), 200
+
+    # Token oluştur
+    verify_token = jwt.encode({
+        'email': email,
+        'exp': datetime.utcnow() + timedelta(hours=6)
+    }, current_app.config['SECRET_KEY'], algorithm="HS256")
+
+    # Link ve mail
+    verify_link = f"http://127.0.0.1:5000/verify?token={verify_token}"
+    msg = Message(
+        subject="GlowGenie Hesabını Yeniden Doğrula",
+        sender=current_app.config['MAIL_USERNAME'],
+        recipients=[email],
+        body=f"Merhaba {email},\n\nİşte yeni doğrulama bağlantın:\n{verify_link}"
+    )
+
+    try:
+        mail.send(msg)
+        return jsonify({'message': 'Yeni doğrulama linki gönderildi'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Mail gönderilemedi', 'detail': str(e)}), 500
+
 
 
 # login user
