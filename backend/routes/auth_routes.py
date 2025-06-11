@@ -8,6 +8,7 @@ from mail_config import mail
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
+from flask import redirect
 
 
 auth_bp = Blueprint('auth_bp', __name__)
@@ -164,7 +165,7 @@ def register_user():
 def verify_email():
     token = request.args.get('token')
     if not token:
-        return jsonify({"error": "Token bulunamadı"}), 400
+        return redirect("http://localhost:3000/home-page?verified=false")
 
     try:
         data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
@@ -173,12 +174,13 @@ def verify_email():
         if user:
             user.is_verified = True
             db.session.commit()
-            return jsonify({"message": f"{email} başarıyla doğrulandı!", "is_verified": user.is_verified})
-        return jsonify({"error": "Kullanıcı bulunamadı"}), 404
+            # ✅ Frontend'e yönlendir, verified=true parametresi ile
+            return redirect("http://localhost:3000/home-page?verified=true")
+        return redirect("http://localhost:3000/home-page?verified=false")
     except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Token süresi dolmuş"}), 400
+        return redirect("http://localhost:3000/home-page?verified=expired")
     except jwt.InvalidTokenError:
-        return jsonify({"error": "Token geçersiz"}), 400
+        return redirect("http://localhost:3000/home-page?verified=invalid")
 
 
 # login user

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import OptionsPanel from '../../components/OptionsPanel/OptionsPanel';
 import SkinTypePopup from '../../components/SkinTypePopup/SkinTypeTestPopup';
@@ -18,6 +18,7 @@ const HomePage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const togglePopup = () => setShowPopup(prev => !prev);
@@ -95,6 +96,21 @@ const onLoginSuccess = (data) => {
       .then(data => setSkinTones(data))
       .catch(err => console.error("Skin tones fetch failed", err));
   }, []);
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const verifiedStatus = params.get("verified");
+
+  if (verifiedStatus === "true") {
+    alert("✅ Email doğrulaması başarılı! Giriş yapabilirsiniz.");
+  } else if (verifiedStatus === "expired") {
+    alert("❌ Doğrulama bağlantısının süresi dolmuş.");
+  } else if (verifiedStatus === "invalid") {
+    alert("❌ Geçersiz doğrulama bağlantısı.");
+  } else if (verifiedStatus === "false") {
+    alert("❌ Kullanıcı bulunamadı.");
+  }
+  }, [location]);
 
   const updateProfile = (updatedProfile) => {
     const token = localStorage.getItem("token");
