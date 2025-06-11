@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import "./SkinTypeTest.css";
 import SkinTypePopup from '../../components/SkinTypePopup';
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,7 @@ function SkinTypeTest() {
   const [error, setError] = useState(false);
   const [result, setResult] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const letterMap = ["a", "b", "c", "d"];
 
@@ -75,6 +76,15 @@ function SkinTypeTest() {
     }
   ];
 
+useEffect(() => {
+  const storedUserId = localStorage.getItem("userId");
+  console.log("storedUserId:", storedUserId); // 🧪 TEST
+  if (storedUserId) {
+    setUserId(parseInt(storedUserId));
+  }
+}, []);
+
+
   const handleAnswerChange = (index, value) => {
     const updated = [...answers];
     updated[index] = value;
@@ -87,7 +97,7 @@ function SkinTypeTest() {
       setError(false);
 
       const payload = {
-        user_id: 20,
+        user_id: userId,
         Q1: letterMap[questions[0].options.indexOf(answers[0])],
         Q2: letterMap[questions[1].options.indexOf(answers[1])],
         Q3: letterMap[questions[2].options.indexOf(answers[2])],

@@ -31,6 +31,7 @@ const HomePage = () => {
 const onLoginSuccess = (data) => {
   localStorage.setItem("token", data.token);
   localStorage.setItem("isLoggedIn", "true");
+  localStorage.setItem("userId", data.user_id); // 🔥 Burası eksikti
   setIsLoggedIn(true);
   setShowPopup(false);
   alert("Login Successful!");
@@ -46,6 +47,7 @@ const onLoginSuccess = (data) => {
       console.error("Failed to fetch user profile after login:", err);
     });
 };
+
 
 
   useEffect(() => {
