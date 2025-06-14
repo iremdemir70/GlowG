@@ -24,7 +24,14 @@ const LoginForm = ({ onLoginSuccess }) => {
       })
       .then(data => {
         setLoginError('');
-        onLoginSuccess(data); // HomePage'deki onLoginSuccess'e veri gönder
+          /* ---------- ⭐️ oturum verisini kaydet ---------- */
+        localStorage.setItem('token',      data.token);
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userId',     data.user_id);
+        localStorage.setItem('isAdmin',    data.is_admin);  // <‑‑ kritik
+        /* ---------------------------------------------- */
+
+        onLoginSuccess(data);  // HomePage'e haber ver
       })
       .catch(err => {
         console.error("Login failed:", err.message);

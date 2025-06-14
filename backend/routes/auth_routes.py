@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app, redirect, abort
 from models.user import User
 from flasgger import swag_from
 from database.db import bcrypt, db
@@ -10,30 +10,53 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import redirect
 
-
+from flask_jwt_extended import (
+    create_access_token,      # ⭐️ access token üretimi
+    verify_jwt_in_request,    # ⭐️ custom decorator içinde
+    get_jwt_identity,         # ⭐️ identity(email)
+    get_jwt                   # (isteğe bağlı) claims
+)
 auth_bp = Blueprint('auth_bp', __name__)
-
+def generate_access_token(user, expires_in_hours=24):
+    """
+    Flask‑JWT‑Extended ile access token üretir.
+    Identity = kullanıcının e‑postası (product_routes.py böyle bekliyor).
+    Ek claim: is_admin
+    """
+    return create_access_token(
+        identity=user.email,                       # ⭐️ email
+        additional_claims={"is_admin": user.is_admin},
+        expires_delta=timedelta(hours=expires_in_hours)
+    )
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = None
-        if 'Authorization' in request.headers:
-            bearer = request.headers['Authorization']
-            token = bearer.split(" ")[1] if " " in bearer else bearer
+        # Token’in varlığını ve geçerliliğini kontrol et
+        verify_jwt_in_request()                    # ⭐️
 
-        if not token:
-            return {'message': 'Token gerekli!'}, 401
+        # Identity artık e‑posta
+        current_user_email = get_jwt_identity()
+        current_user = User.query.filter_by(email=current_user_email).first()
 
-        try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-            current_user = User.query.get(data['user_id'])
-        except jwt.ExpiredSignatureError:
-            return {'message': 'Token süresi dolmuş!'}, 401
-        except jwt.InvalidTokenError:
-            return {'message': 'Token geçersiz!'}, 401
+        if not current_user:
+            abort(401, description='Kullanıcı bulunamadı!')
 
         return f(current_user, *args, **kwargs)
     return decorated
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(current_user, *args, **kwargs):
+        if not current_user.is_admin:
+            abort(403, description='Yönetici yetkisi gerekli!')
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+@auth_bp.route('/admin-only', methods=['GET'])
+@token_required
+@admin_required
+def admin_only_route(current_user):
+    return jsonify({'message': 'Admin yetkisi ile erişildi'})
 
 # get all user
 @auth_bp.route('/users', methods=['GET'])
@@ -222,7 +245,6 @@ def resend_verification():
 
 
 
-# login user
 @auth_bp.route('/login', methods=['POST'])
 @swag_from({
     'tags': ['Auth'],
@@ -258,16 +280,15 @@ def login_user():
 
     if not user.is_verified:
         return {'message': 'Lütfen hesabınızı doğrulayın.'}, 403
+    token = generate_access_token(user)
+    
 
-    token = jwt.encode({
-        'user_id': user.user_id,
-        'exp': datetime.utcnow() + timedelta(hours=24)
-    }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
     return {
         'message': 'Giriş başarılı',
         'token': token,
-        'user_id': user.user_id
+        'user_id': user.user_id,
+        'is_admin': user.is_admin  # ✅ Ek bilgi
     }, 200
 
 #UPDATE PROFILE
@@ -332,7 +353,8 @@ def update_profile(current_user):
                     'skin_type_id': 2,
                     'skin_tone_id': 1,
                     'allergens': [],
-                    'is_verified': True
+                    'is_verified': True,
+                    'is_admin': False  # ✅ Ek bilgi
                 }
             }
         }
@@ -340,6 +362,7 @@ def update_profile(current_user):
 })
 def get_profile(current_user):
     return jsonify(current_user.to_dict()), 200
+
 
 
 # forgot-password

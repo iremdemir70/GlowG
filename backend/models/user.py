@@ -13,6 +13,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
     allergens = db.Column(ARRAY(db.Text)) 
+    is_admin = db.Column(db.Boolean, default=False)  # EKLENEN
 
     def to_dict(self):
         skin_type = SkinType.query.get(self.skin_type_id)
@@ -23,9 +24,9 @@ class User(db.Model):
             'email': self.email,
             'is_verified': self.is_verified,
             'allergens': self.allergens,
-            'skin_type_id': self.skin_type_id,            # 👈 BUNLAR EKLENDİ
-            'skin_tone_id': self.skin_tone_id,   
+            'skin_type_id': self.skin_type_id,
+            'skin_tone_id': self.skin_tone_id,
             'skin_type_name': skin_type.type_name if skin_type else None,
-            'skin_tone_name': skin_tone.tone_name if skin_tone else None
+            'skin_tone_name': skin_tone.tone_name if skin_tone else None,
+            'is_admin': self.is_admin  # EKLENEN
         }
-

@@ -6,6 +6,7 @@ from instance.config import Config
 from database.db import db, bcrypt
 from flasgger import Swagger
 from apscheduler.schedulers.background import BackgroundScheduler
+from flask_jwt_extended import JWTManager
 
 # Route dosyaları
 from routes.option_routes import options_bp
@@ -22,6 +23,11 @@ app.config.from_object(Config)
 
 # 🔐 Secret Key
 app.config['SECRET_KEY'] = 'glowgenie-süper-gizli-anahtar'
+app.config["JWT_SECRET_KEY"] = app.config['SECRET_KEY']  # Veya ayrı bir secret key belirtebilirsin
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]  # Token'ın nereden okunacağını belirtiyoruz (header)
+
+
+jwt = JWTManager(app)
 
 # ✅ CORS ayarı (tek satır yeterli)
 CORS(app, origins=["http://localhost:3000"])
@@ -92,3 +98,4 @@ scheduler.start()
 # ✅ Çalıştır
 if __name__ == '__main__':
     app.run()
+
